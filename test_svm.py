@@ -10,8 +10,6 @@ def score_all(train_data,svr):
 	x = []
 	y = []
 	for data in train_data:
-		if len(data) != 6:
-			continue
 		real = data.pop()
 		predicted = svr.predict(data)
 		x.append(real)
@@ -50,8 +48,10 @@ y = np.array(y)
 ###############################################################################
 # Fit regression model
 from sklearn import svm
+from sklearn import linear_model
+from scipy.stats import *
 
-clf = svm.SVC()
+clf = linear_model.LinearRegression()
 clf.fit(X,y)
 
 #svr_rbf = SVR(kernel='rbf', C=1e3, gamma=0.1)
@@ -67,10 +67,14 @@ new_y= score_orig(X,clf)
 plt.subplot(121)
 plt.scatter(scores,new_y)
 
+print pearsonr(scores,new_y)
+
 x,y = score_all(test_data,clf)
 
 plt.subplot(122)
 plt.scatter(x,y)
+
+print pearsonr(x,y)
 
 
 plt.show()

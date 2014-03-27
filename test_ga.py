@@ -13,32 +13,35 @@ train_data = pickle.load( open( "train_data.p", "rb" ) )
 # This is the Sphere Function
 def sphere(xlist):
 	total = 0
-	sum_x = 0
-	sum_y = 0
-	sum_xy = 0
-	sum_x2 = 0
-	sum_y2 = 0
+	#sum_x = 0
+	#sum_y = 0
+	#sum_xy = 0
+	#sum_x2 = 0
+	#sum_y2 = 0
 	for data in train_data:
-		score = 0
+		score = 100
 		for j,weight in enumerate(xlist):
 			score += weight*data[j]
-		#total += abs(score - data[-1])**2
-		sum_x += data[-1]
-		sum_y += score
-		sum_xy += data[-1]*score
-		sum_x2 += data[-1]**2
-		sum_y2 += score**2
+		if score > 100:
+			score = 100
+		total += abs(score - data[-1])**2
 
-	n = float(len(train_data))
-
+		if data[-1] < 85 and score > 95:
+			total += 10000
+		#sum_x += data[-1]
+		#sum_y += score
+		#sum_xy += data[-1]*score
+		#sum_x2 += data[-1]**2
+		#sum_y2 += score**2
 
 	#print sum_x,sum_y,sum_xy,sum_x2,sum_y2
-	try:
-		r = (sum_xy - (sum_x*sum_y)/n) / math.sqrt((sum_x2 - ((sum_x**2)/n))*(sum_y2 - ((sum_y**2)/n)))
-	except:
-		r = 0
+	#try:
+	#	r = (sum_xy - (sum_x*sum_y)/n) / math.sqrt((sum_x2 - ((sum_x**2)/n))*(sum_y2 - ((sum_y**2)/n)))
+	#except:
+	#	r = 0
 
-	return abs(r)
+	#return abs(r)
+	return total
 
 def test_data(best):
 	x = []
@@ -46,9 +49,11 @@ def test_data(best):
 	count = 0
 	print best
 	for data in train_data:
-		score = 0
+		score = 100
 		for j,weight in enumerate(best):
 			score += weight*data[j]
+		if score > 100:
+			score = 100
 		x.append(data[-1])
 		y.append(score)
 
@@ -60,13 +65,13 @@ def test_data(best):
 
 def run_main():
 	genome = G1DList.G1DList(5)
-	genome.setParams(rangemin=0, rangemax=30, bestrawscore=0.00, rounddecimal=6)
+	genome.setParams(rangemin=-10, rangemax=20, bestrawscore=0.00, rounddecimal=6)
 	genome.initializator.set(Initializators.G1DListInitializatorReal)
 	genome.mutator.set(Mutators.G1DListMutatorRealGaussian)
 	genome.evaluator.set(sphere)
 
 	ga = GSimpleGA.GSimpleGA(genome)
-	ga.setMinimax(Consts.minimaxType["maximize"])
+	ga.setMinimax(Consts.minimaxType["minimize"])
 	ga.setGenerations(20)
 	ga.setMutationRate(0.06)
 	ga.setCrossoverRate(0.9)
