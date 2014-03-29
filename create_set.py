@@ -84,8 +84,18 @@ for k,v in distro.iteritems():
 
 #print len(test_data),len(train_data)
 
-pickle.dump(train_data, open( "train_data.p", "wb" ))
-pickle.dump(test_data, open( "test_data.p", "wb" ))
+#pickle.dump(train_data, open( "train_data.p", "wb" ))
+#pickle.dump(test_data, open( "test_data.p", "wb" ))
+
+short_data = test_data[::50]
+
+for data in short_data:
+	for k,vdata in v_hash.iteritems():
+		diff = abs(data[0] - float(vdata[1]))
+		diff1 = abs(data[1] - float(vdata[2]))
+		if diff < 0.01 and diff1 < 0.01:
+			print lines[int(k)]
+	#for l in 
 
 
 
