@@ -184,13 +184,22 @@ class Structure_FG(FeatureGenerator):
 		construct.features['not_stem_capped'] = not_stem_capped
 
 class Vienna_FG(FeatureGenerator):
+	"""
+	Vienna RNA feature.
+	currently populates construct.features with
+	::
+		avg_structure_diff
+		free_energy
+		melting_temp
+		mfe_prob
+		ensemble_diversity
+	"""
 	def __init__(self):
-
-		
+		pass
 
 	def generate_for_construct(self, construct):
 		vienna_f = open("seq.fa","w")
-		vienna_f.write(">seq1\n"+seq)
+		vienna_f.write(">seq1\n"+construct.sequence)
 		vienna_f.close()
 
 		subprocess.call("RNAfold -T 37 -p2 -d2 < seq.fa > seq.out",shell=True)
@@ -207,7 +216,7 @@ class Vienna_FG(FeatureGenerator):
 
 		diff = 0.0
 		for i,e in enumerate(predicted_structure):
-			if e != ss[i]:
+			if e != construct.structure[i]:
 				diff += 1
 
 		spl = re.split("\s+",seq_lines[-1])
@@ -240,6 +249,15 @@ class Vienna_FG(FeatureGenerator):
 			if current_temp == 0:
 				melting_temp = 0
 				break
+
+		data = [diff/float(len(predicted_structure)),float(free_energy),melting_temp,float(spl[7][:-1]),float(spl[10])]
+		
+		construct.features['avg_structure_diff'] = diff/float(len(predicted_structure))
+		construct.features['free_energy'] = float(free_energy)
+		construct.features['melting_temp'] = melting_temp
+		construct.features['mfe_prob'] = float(spl[7][:-1])
+		construct.features['ensemble_diversity'] = float(spl[10])
+
 
 
 
