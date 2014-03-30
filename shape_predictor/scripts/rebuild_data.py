@@ -20,20 +20,36 @@ import sys
 import re
 import glob
 import argparse
+import random
 
 from shape_predictor.util import *
+from shape_predictor.construct_factory import *
 from shape_predictor.feature_generator_factory import *
 
-def parse_args():
-	parser = argparse.ArgumentParser(
-	    description='')
-	
-	parser.add_argument('-s', help='pdb structure', required=False)
+def populate_features_for_constructs(constructs,fgs):
+	for c in constructs:
+		for fg in feature_generators:
+			fg.generate_for_construct(c)
 
-	args = parser.parse_args()
-	return args
+def generated_simulated_construct_data(nconstructs,features):
+	rand_constructs = []
 
-args = parse_args()
+	for i in range(nconstructs):
+		r_construct = ConstructFactory.random()
+		rand_constructs.append(r_construct)
+
+		populate_features_for_constructs(rand_constructs,feature_generators)
+
+		sim_data = []
+		for c in constructs:
+			data = []
+			for f in features:
+				data.append(c.features[f])
+			data.append(c.eterna_score)
+			sim_data.append(data)
+
+	pickle.dump(rand_constructs,open(data_path+"simulated_decoy_constructs.p","wb"))
+	pickle.dump(sim_data,open(data_path+"simulated_decoy_data.p","wb"))
 
 data_path = os.environ["ShapePredictor"]+"/shape_predictor/data/"
 
@@ -43,13 +59,54 @@ constructs = get_constructs_from_rdats(dir=rdat_files_path)
 
 #rebuild features
 feature_generators = FeatureGeneratorFactory.all_generators() 
+#populate_features_for_constructs(constructs,feature_generators)
 
-vienna_fg = Vienna_FG()
+#sorted feature list
+features = constructs[0].features.keys()
+features.sort(reverse=True)
 
+#build simulated data for decoys in machine learning fit, need about 100
+#decoys
+generated_simulated_construct_data(120,features)
+
+constructs = pickle.load(open(data_path+"constructs.p","rb"))
+
+#extract just features and eterna score for machine learning fit
+constructs_by_score = {}
+bin = 5
+features = constructs[0].features.keys()
+features.sort(reverse=True)
 for c in constructs:
-	for fg in feature_generators:
-		fg.generate_for_construct(c)
+	data = []
+	for f in features:
+		data.append(c.features[f])
+	data.append(c.eterna_score)
 
+	binned = round(float(c.eterna_score) / bin)*bin
+	if binned not in constructs_by_score:
+		constructs_by_score[binned] = []
+	constructs_by_score[binned].append(data)
+
+test_faction = 0.20
+train_data = []
+test_data = []
+
+for k,v in constructs_by_score.iteritems():
+	if int(k) == 0:
+		continue
+
+	cutoff = round(len(v)*test_faction)
+
+	random.shuffle(v)
+
+	for i,point in enumerate(v):
+		if i < cutoff:
+			test_data.append(point)
+		else:
+			train_data.append(point)
+
+pickle.dump(train_data, open( data_path+"train_data.p", "wb" ))
+pickle.dump(test_data, open( data_path+"test_data.p", "wb" ))
 pickle.dump(constructs,open(data_path+"constructs.p","wb"))
 
 

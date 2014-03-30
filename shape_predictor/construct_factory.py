@@ -15,6 +15,10 @@
 #	You should have received a copy of the GNU General Public License
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import re
+import random
+import subprocess
+
 from construct import *
 from ss_tree import *
 
@@ -27,7 +31,7 @@ def generate_bp(res1,res2):
 	"""
 	ss = ['(',')']
 	seq = [res1,res2]
-	bp = Basepair(ss,seq)
+	bp = SSN_Basepair(ss,seq)
 	return bp
 
 def generate_hairpin_random(size):
@@ -47,7 +51,7 @@ def generate_hairpin_random(size):
 	seq.extend(x_seq)
 	seq.extend(['N','N'])
 
-	return Bulge(ss,seq)
+	return SSN_Bulge(ss,seq)
 
 def generate_bulge_random(size_x,size_y):
 	ss = []
@@ -78,7 +82,7 @@ def generate_bulge_random(size_x,size_y):
 	seq.extend(['N','N'])
 	seq.extend(y_seq)
 
-	return Bulge(ss,seq)
+	return SSN_Bulge(ss,seq)
 
 def random_ss_node():
 	rand = random.randrange(1000)
@@ -91,16 +95,94 @@ def random_ss_node():
 	else:
 		x_size = random.randrange(5)
 		y_size = random.randrange(5)
-		node = generate_bulge(x_size,y_size)
+		node = generate_bulge_random(x_size,y_size)
 
 	return node
+
+def generate_random_rna(size):
+	nodes = []
+	for i in range(size):
+		node = random_ss_node()
+
+		if i == 0:
+			nodes.append(node)
+			continue
+
+		nodes[-1].children.append(node)
+		nodes.append(node)
+
+	hairpin = generate_hairpin_random(random.randrange(3,7))
+	nodes[-1].children.append(hairpin)
+
+	return nodes[0].get_ss_and_seq()
+
+def calculate_estimated_score(seq,ss):
+	pairing_sum = {}
+
+	f = open("test.ppairs")
+	lines = f.readlines()
+	f.close()
+
+	lines = lines[15:]
+
+	max = len(seq)
+
+	for l in lines:
+		spl = re.split("\s+",l)
+
+		if int(spl[0]) > max or int(spl[1]) > max:
+			continue
+
+		if spl[0] not in pairing_sum:
+			pairing_sum[spl[0]] = 0
+		if spl[1] not in pairing_sum:
+			pairing_sum[spl[1]] = 0
+
+		pairing_sum[spl[0]] += float(spl[2])
+		pairing_sum[spl[1]] += float(spl[2])
+
+	score = 0
+	points = 0.0
+
+	for k,v in pairing_sum.iteritems():
+		pos = int(k)-1
+
+		paired = 1
+		if ss[pos] == ".":
+			paired = 0
+
+		if paired == 0 and v < 0.10:
+			points += 1
+		if paired == 1 and v > 0.90:
+			points += 1
+
+	return (points / len(seq)) * 100
 
 
 class ConstructFactory(object):
 
 	@staticmethod
-	def random(size):
-		pass
+	def random():
+		score = 100
+		construct = None
+
+		while score > 40:
+			ss,seq = generate_random_rna(random.randrange(5,40))
+
+			f = open("test.in","w")
+			f.write(seq)
+			f.close()
+
+			subprocess.call("~/Downloads/nupack3.0.1/bin/pairs test",shell=True)
+
+			score = calculate_estimated_score(seq,ss)
+
+			construct = Construct(seq,ss,score)
+
+		return construct
+
+
+		
 
 
 

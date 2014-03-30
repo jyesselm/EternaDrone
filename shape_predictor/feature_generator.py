@@ -224,7 +224,7 @@ class Vienna_FG(FeatureGenerator):
 		done = 0
 		current_temp = 130
 		current = get_free_energy_at_temp(current_temp)
-		last_temp = current_temp + 150
+		last_temp = current_temp + 20
 		last = get_free_energy_at_temp(last_temp)
 
 		melting_temp = -1

@@ -20,14 +20,14 @@ class Construct(object):
 	def __init__(self,seq=None,ss=None,score=None):
 		self.sequence = seq.upper()
 		self.structure = ss
-		self.eterna_score = score
+		self.eterna_score = float(score)
 		self.features = {}
 
 	def __repr__(self):
 		string = "Construct:\n"
 		string += "Sequence: " + self.sequence + "\n"
 		string += "Structure: " + self.structure + "\n"
-		string += "Eterna Score: " + self.eterna_score + "\n"
+		string += "Eterna Score: " + str(self.eterna_score) + "\n"
 		string += "Features: \n"
 		feature_list = self.features.keys()
 		feature_list.sort(reverse=True)
