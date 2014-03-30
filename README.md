@@ -6,17 +6,21 @@ Please checkout our documentation website at: http://jyesselm.github.io/Eterna_D
 
 Authors
 ------
-Dr. Joseph Yesselman : Postdoc Associate with Rhiju Das\n 
-Dr. Rhiju Das : Assistant Professor at Stanford Univeristy\n 
+Dr. Joseph Yesselman : Postdoc Associate with Rhiju Das
+
+Dr. Rhiju Das : Assistant Professor at Stanford Univeristy
 
 Install
 ------
 Required python packages: numpy,matlibplot,sklearn,scipy if you have pip or easy_install you can install each at command line.
 
-Also requires, rdatkit for processing RDAT files for eterna data which can get gotten at https://github.com/hitrace/rdatkit\n
-git clone git@github.com:hitrace/rdatkit.git\n
-cd rdatkit\n
-sudo python setup.py install\n
+Also requires, rdatkit for processing RDAT files for eterna data which can get gotten at https://github.com/hitrace/rdatkit
+
+git clone git@github.com:hitrace/rdatkit.git
+
+cd rdatkit
+
+sudo python setup.py install
 
 Also requires Vienna RNA package which can be downloaded from http://www.tbi.univie.ac.at/RNA/
 I am currently using ViennaRNA-1.8.5.tar.gz
