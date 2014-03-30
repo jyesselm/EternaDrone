@@ -471,39 +471,6 @@ class SecondaryStructureTree(object):
 
 			open_nodes.extend(current.children)
 	
-def is_au(bp_str):
-	if bp_str == "AU" or bp_str == "UA":
-		return 1
-	else:
-		return 0
-
-def is_gc(bp_str):
-	if bp_str == "GC" or bp_str == "CG":
-		return 1
-	else:
-		return 0 
-
-def is_wc(bp_str):
-	if is_au(bp_str) or is_gc(bp_str):
-		return 1
-	else:
-		return 0
-
-def get_max_stretch(n,seq):
-
-	max = 0
-	count = 0
-	for e in seq:
-		if e == n:
-			count += 1
-		else:
-			if count > max:
-				max = count
-			count =0
-
-	return max
-
-
 
 
 
