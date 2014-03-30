@@ -78,7 +78,6 @@ model = None
 if args.model:
 	model = parse_model_file(args.model,features)
 
-
 precompiled_data = 0
 
 if args.seq and args.ss:
@@ -89,7 +88,7 @@ if args.seq and args.ss:
 	populate_features_for_constructs(constructs,feature_generators)
 
 elif args.f:
-	
+	raise ValueError("not implemented yet")
 
 else:
 	print "no new sequences and structures are specified using precompiled constructs"
