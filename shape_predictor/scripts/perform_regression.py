@@ -15,6 +15,7 @@
 #	You should have received a copy of the GNU General Public License
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 import sys
 import cPickle as pickle
 
@@ -29,7 +30,7 @@ def score_all(train_data,svr):
 	x = []
 	y = []
 	for data in train_data:
-		real = data.pop()
+		real = float(data.pop())
 		predicted = svr.predict(data)
 		x.append(real)
 		y.append(predicted)
@@ -47,7 +48,7 @@ def score_orig(train_data,svr):
 data_path = os.environ["ShapePredictor"]+"/shape_predictor/data/"
 
 train_data = pickle.load( open( data_path+"train_data.p", "rb" ) )
-decoy_data = pickle.load( open( data_path+"decoy_data.p", "rb" ) )
+decoy_data = pickle.load( open( data_path+"simulated_decoy_data.p", "rb" ) )
 test_data = pickle.load(  open( data_path+"test_data.p", "rb" ) )
 
 X = train_data
@@ -55,12 +56,12 @@ X.extend(decoy_data[:100])
 
 y = []
 for data in X:
-	score = data.pop()
+	score = float(data.pop())
 	y.append(score)
 
 y = np.array(y)
 
-clf = RandomForestRegressor(n_estimators=100)
+clf = RandomForestRegressor(n_estimators=10)
 clf.fit(X, y)
 
 #save predictor to be used for later
@@ -69,14 +70,14 @@ pickle.dump(clf, open( data_path+"predictor.p", "wb" ))
 #plot data
 new_y= score_orig(X,clf)
 plt.subplot(121)
-plt.scatter(scores,new_y)
+plt.scatter(y,new_y)
 
 y_new = []
 
 for e in new_y:
 	y_new.append(e[0])
 
-print "Correlation with training_data",pearsonr(scores,y_new)
+print "Correlation with training_data",pearsonr(y,y_new)
 
 x,y = score_all(test_data,clf)
 

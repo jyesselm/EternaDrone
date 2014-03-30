@@ -89,6 +89,11 @@ def get_constructs_from_rdats(dir):
 
 	return construct_objs
 
+def populate_features_for_constructs(constructs,fgs):
+	for c in constructs:
+		for fg in fgs:
+			fg.generate_for_construct(c)
+
 #generally useful small functions
 #basepair classifying functions
 ##############################################################################

@@ -26,27 +26,23 @@ from shape_predictor.util import *
 from shape_predictor.construct_factory import *
 from shape_predictor.feature_generator_factory import *
 
-def populate_features_for_constructs(constructs,fgs):
-	for c in constructs:
-		for fg in feature_generators:
-			fg.generate_for_construct(c)
 
-def generated_simulated_construct_data(nconstructs,features):
+def generated_simulated_construct_data(nconstructs,feature_generators,features):
 	rand_constructs = []
 
 	for i in range(nconstructs):
 		r_construct = ConstructFactory.random()
 		rand_constructs.append(r_construct)
 
-		populate_features_for_constructs(rand_constructs,feature_generators)
+	populate_features_for_constructs(rand_constructs,feature_generators)
 
-		sim_data = []
-		for c in constructs:
-			data = []
-			for f in features:
-				data.append(c.features[f])
-			data.append(c.eterna_score)
-			sim_data.append(data)
+	sim_data = []
+	for c in rand_constructs:
+		data = []
+		for f in features:
+			data.append(c.features[f])
+		data.append(c.eterna_score)
+		sim_data.append(data)
 
 	pickle.dump(rand_constructs,open(data_path+"simulated_decoy_constructs.p","wb"))
 	pickle.dump(sim_data,open(data_path+"simulated_decoy_data.p","wb"))
@@ -61,15 +57,15 @@ constructs = get_constructs_from_rdats(dir=rdat_files_path)
 feature_generators = FeatureGeneratorFactory.all_generators() 
 #populate_features_for_constructs(constructs,feature_generators)
 
+constructs = pickle.load(open(data_path+"constructs.p","rb"))
+
 #sorted feature list
 features = constructs[0].features.keys()
 features.sort(reverse=True)
 
 #build simulated data for decoys in machine learning fit, need about 100
 #decoys
-generated_simulated_construct_data(120,features)
-
-constructs = pickle.load(open(data_path+"constructs.p","rb"))
+generated_simulated_construct_data(101,feature_generators,features)
 
 #extract just features and eterna score for machine learning fit
 constructs_by_score = {}
