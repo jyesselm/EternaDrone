@@ -1,0 +1,6 @@
+shape_predictor.util.parse_rdat_files_in_dir
+============================================
+
+.. currentmodule:: shape_predictor.util
+
+.. autofunction:: parse_rdat_files_in_dir

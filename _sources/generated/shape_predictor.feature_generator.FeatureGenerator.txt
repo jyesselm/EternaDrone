@@ -1,0 +1,7 @@
+shape_predictor.feature_generator.FeatureGenerator
+==================================================
+
+.. currentmodule:: shape_predictor.feature_generator
+
+.. autoclass:: FeatureGenerator
+   :members:

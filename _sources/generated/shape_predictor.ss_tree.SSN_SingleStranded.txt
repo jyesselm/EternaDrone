@@ -1,0 +1,7 @@
+shape_predictor.ss_tree.SSN_SingleStranded
+==========================================
+
+.. currentmodule:: shape_predictor.ss_tree
+
+.. autoclass:: SSN_SingleStranded
+   :members:

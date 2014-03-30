@@ -1,0 +1,6 @@
+shape_predictor.util.get_constructs_from_rdats
+==============================================
+
+.. currentmodule:: shape_predictor.util
+
+.. autofunction:: get_constructs_from_rdats

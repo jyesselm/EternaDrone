@@ -1,0 +1,7 @@
+shape_predictor.ss_tree.SSN_Basepair
+====================================
+
+.. currentmodule:: shape_predictor.ss_tree
+
+.. autoclass:: SSN_Basepair
+   :members:

@@ -1,0 +1,7 @@
+shape_predictor.feature_generator.Structure_FG
+==============================================
+
+.. currentmodule:: shape_predictor.feature_generator
+
+.. autoclass:: Structure_FG
+   :members:

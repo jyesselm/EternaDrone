@@ -1,0 +1,7 @@
+ss_tree.SecondaryStructureTree
+==============================
+
+.. currentmodule:: ss_tree
+
+.. autoclass:: SecondaryStructureTree
+   :members:

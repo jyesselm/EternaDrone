@@ -1,0 +1,7 @@
+shape_predictor.feature_generator.Sequence_FG
+=============================================
+
+.. currentmodule:: shape_predictor.feature_generator
+
+.. autoclass:: Sequence_FG
+   :members:

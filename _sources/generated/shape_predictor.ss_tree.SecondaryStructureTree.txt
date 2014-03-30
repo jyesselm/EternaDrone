@@ -1,0 +1,7 @@
+shape_predictor.ss_tree.SecondaryStructureTree
+==============================================
+
+.. currentmodule:: shape_predictor.ss_tree
+
+.. autoclass:: SecondaryStructureTree
+   :members:

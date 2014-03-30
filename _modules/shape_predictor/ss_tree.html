@@ -1,0 +1,564 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>shape_predictor.ss_tree &mdash; shape_predictor 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="shape_predictor 0.1 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../index.html" class="fa fa-home"> shape_predictor</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../features.html">Features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../features.html#what-is-a-feature">What is a Feature?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../features.html#feature-generation">Feature Generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../features.html#adding-new-features">Adding New Features</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../model_testing.html">Model Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../model_testing.html#machine-learned-model">Machine Learned Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../model_testing.html#custom-specified-model">Custom Specified Model</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../secondary_structure.html">Secondary Structure Layout</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../secondary_structure.html#secondary-structure-classes">Secondary Structure Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../secondary_structure.html#types-of-nodes">Types of Nodes</a></li>
+</ul>
+</li>
+</ul>
+<ul class="simple">
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">shape_predictor</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>shape_predictor.ss_tree</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for shape_predictor.ss_tree</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: UTF-8 -*-</span>
+
+<span class="c">#This file is part of shape_predictor.</span>
+<span class="c">#    Copyright (C) 2013  Joseph Yesselman &lt;jyesselm@stanford.edu&gt;</span>
+<span class="c">#</span>
+<span class="c">#    This program is free software: you can redistribute it and/or modify</span>
+<span class="c">#    it under the terms of the GNU General Public License as published by</span>
+<span class="c">#    the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c">#    (at your option) any later version.</span>
+<span class="c">#</span>
+<span class="c">#    This program is distributed in the hope that it will be useful,</span>
+<span class="c">#    but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c">#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c">#    GNU General Public License for more details.</span>
+<span class="c">#</span>
+<span class="c">#    You should have received a copy of the GNU General Public License</span>
+<span class="c">#    along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="k">def</span> <span class="nf">get_bracket_pair</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span><span class="n">ss</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	finds the position of &quot;)&quot; pair to the current &quot;(&quot; in the secondary </span>
+<span class="sd">	structure array</span>
+
+<span class="sd">	:params pos: position in secondary structure of current &quot;(&quot;</span>
+<span class="sd">	:type pos: int</span>
+<span class="sd">	:params ss: secondary structure </span>
+<span class="sd">	:type ss: List</span>
+<span class="sd">	:returns: int -- the position of the paired &quot;)&quot; in list ss</span>
+<span class="sd">	:raises: ValueError</span>
+
+<span class="sd">	&gt;&gt;&gt;print get_bracket_pair(0, [(,(, ., ), )])</span>
+<span class="sd">	4</span>
+
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="n">bracket_count</span> <span class="o">=</span> <span class="mi">0</span>
+	<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">e</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ss</span><span class="p">):</span>
+		<span class="k">if</span> <span class="n">e</span> <span class="o">==</span> <span class="s">&quot;(&quot;</span><span class="p">:</span>
+			<span class="n">bracket_count</span> <span class="o">+=</span> <span class="mi">1</span>
+		<span class="k">elif</span> <span class="n">e</span> <span class="o">==</span> <span class="s">&quot;)&quot;</span><span class="p">:</span>
+			<span class="n">bracket_count</span> <span class="o">-=</span> <span class="mi">1</span>
+			<span class="k">if</span> <span class="n">bracket_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+				<span class="k">return</span> <span class="n">i</span>
+	<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;cannot find pair&quot;</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">get_dot_bounds</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span><span class="n">ss</span><span class="p">,</span><span class="n">reverse</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	finds the bounds of a current dot stretch  </span>
+
+<span class="sd">	:params pos: position in secondary structure of current &quot;.&quot;</span>
+<span class="sd">	:type pos: int</span>
+<span class="sd">	:params ss: secondary structure </span>
+<span class="sd">	:type ss: List</span>
+<span class="sd">	:params reverse: direction of search::</span>
+<span class="sd">		0 -- postive, going left to right in the array</span>
+<span class="sd">		1 -- negative, going right to left in the array</span>
+<span class="sd">	:type reverse: int</span>
+<span class="sd">	:state reverse: 0</span>
+<span class="sd">	:returns: int -- the position of last &quot;.&quot; in stretch</span>
+
+<span class="sd">	&gt;&gt;&gt;print get_dot_bounds(1,[(, ., ., ., )])</span>
+<span class="sd">	3</span>
+
+<span class="sd">	&gt;&gt;&gt;print get_dot_bounds(3,[(, ., ., ., )],reverse=1)</span>
+<span class="sd">	1</span>
+
+<span class="sd">	&quot;&quot;&quot;</span>
+	
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">reverse</span><span class="p">:</span>
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pos</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">ss</span><span class="p">)):</span>
+			<span class="k">if</span> <span class="n">ss</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&quot;.&quot;</span><span class="p">:</span>
+				<span class="k">return</span> <span class="n">i</span><span class="o">-</span><span class="mi">1</span>
+		<span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">pos</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+			<span class="k">if</span> <span class="n">ss</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="s">&quot;.&quot;</span><span class="p">:</span>
+				<span class="k">return</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span>
+		<span class="k">return</span> <span class="mi">0</span>
+
+	<span class="k">return</span> <span class="n">pos</span>
+
+
+<div class="viewcode-block" id="SecondaryStructureNode"><a class="viewcode-back" href="../../generated/shape_predictor.ss_tree.SecondaryStructureNode.html#shape_predictor.ss_tree.SecondaryStructureNode">[docs]</a><span class="k">class</span> <span class="nc">SecondaryStructureNode</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+	
+
+
+	<span class="k">def</span> <span class="nf">assign_children</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;(&quot;</span><span class="p">:</span>
+
+			<span class="n">pair</span> <span class="o">=</span> <span class="n">get_bracket_pair</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="p">)</span>
+			<span class="c">##print self.ss[0:pair+1]</span>
+			<span class="n">bp</span> <span class="o">=</span> <span class="n">Basepair</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">pair</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">seq</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">pair</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bp</span><span class="p">)</span>
+
+			<span class="bp">self</span><span class="o">.</span><span class="n">ss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="p">[</span><span class="n">pair</span><span class="o">+</span><span class="mi">2</span><span class="p">:]</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">seq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq</span><span class="p">[</span><span class="n">pair</span><span class="o">+</span><span class="mi">2</span><span class="p">:]</span>
+
+		<span class="k">else</span><span class="p">:</span>
+
+			<span class="n">bulge</span> <span class="o">=</span> <span class="n">Bulge</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">seq</span><span class="p">,</span><span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bulge</span><span class="p">)</span>
+
+			<span class="bp">self</span><span class="o">.</span><span class="n">ss</span> <span class="o">=</span> <span class="p">[]</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">seq</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="k">return</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="SecondaryStructureNode.assign_all_children"><a class="viewcode-back" href="../../generated/shape_predictor.ss_tree.SecondaryStructureNode.html#shape_predictor.ss_tree.SecondaryStructureNode.assign_all_children">[docs]</a>	<span class="k">def</span> <span class="nf">assign_all_children</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+		<span class="c">##print self.ss</span>
+		<span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">assign_children</span><span class="p">()</span>
+</div></div>
+<span class="k">class</span> <span class="nc">SingleStranded</span><span class="p">(</span><span class="n">SecondaryStructureNode</span><span class="p">):</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">seq</span><span class="p">,</span><span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">seq</span> <span class="o">=</span> <span class="n">seq</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ss_type</span> <span class="o">=</span> <span class="s">&quot;SingleStranded&quot;</span>
+
+<span class="k">class</span> <span class="nc">Basepair</span><span class="p">(</span><span class="n">SecondaryStructureNode</span><span class="p">):</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ss</span><span class="p">,</span><span class="n">seq</span><span class="p">,</span><span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ss_type</span> <span class="o">=</span> <span class="s">&quot;Basepair&quot;</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">seq</span> <span class="o">=</span> <span class="n">seq</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ss</span> <span class="o">=</span> <span class="n">ss</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">res1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">res2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">bp_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">res1</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">res2</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+	<span class="k">def</span> <span class="nf">get_ss_and_seq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">ss</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+		<span class="n">seq</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+		<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+			<span class="n">c_ss</span><span class="p">,</span><span class="n">c_seq</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get_ss_and_seq</span><span class="p">()</span>
+			<span class="n">ss</span> <span class="o">+=</span> <span class="n">c_ss</span>
+			<span class="n">seq</span> <span class="o">+=</span> <span class="n">c_seq</span>
+
+		<span class="k">return</span> <span class="s">&quot;(&quot;</span> <span class="o">+</span> <span class="n">ss</span> <span class="o">+</span> <span class="s">&quot;)&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">res1</span> <span class="o">+</span> <span class="n">seq</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">res2</span>
+
+<div class="viewcode-block" id="Bulge"><a class="viewcode-back" href="../../generated/shape_predictor.ss_tree.Bulge.html#shape_predictor.ss_tree.Bulge">[docs]</a><span class="k">class</span> <span class="nc">Bulge</span><span class="p">(</span><span class="n">SecondaryStructureNode</span><span class="p">):</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ss</span><span class="p">,</span><span class="n">seq</span><span class="p">,</span><span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">children</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ss_type</span> <span class="o">=</span> <span class="s">&quot;Bulge&quot;</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">sx</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">sy</span> <span class="o">=</span> <span class="p">[]</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">x_seq</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">y_seq</span> <span class="o">=</span> <span class="p">[]</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">seq</span> <span class="o">=</span> <span class="n">seq</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ss</span> <span class="o">=</span> <span class="n">ss</span>
+
+		<span class="c">#print ss,seq</span>
+
+		<span class="c">#remove dots from start</span>
+		<span class="n">end</span> <span class="o">=</span> <span class="n">get_dot_bounds</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="p">)</span>
+		<span class="k">if</span> <span class="n">end</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;.&quot;</span><span class="p">:</span>
+			<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">end</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">sx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">x_seq</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seq</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+
+		<span class="n">end</span> <span class="o">=</span> <span class="n">get_dot_bounds</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="p">,</span><span class="n">reverse</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+		<span class="n">diff</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="p">)</span><span class="o">-</span><span class="n">end</span>
+		<span class="c">#print &quot;&quot;.join(self.ss),diff</span>
+		<span class="k">if</span> <span class="n">diff</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;.&quot;</span><span class="p">:</span>
+			<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">diff</span><span class="p">):</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">sy</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="o">.</span><span class="n">pop</span><span class="p">())</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">y_seq</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seq</span><span class="o">.</span><span class="n">pop</span><span class="p">())</span>
+
+		<span class="c">#print self.x_seq,self.y_seq</span>
+
+		<span class="c">#check for n junction</span>
+		<span class="c">#for e in ss:</span>
+
+	<span class="k">def</span> <span class="nf">get_ss_and_seq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">ss</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+		<span class="n">seq</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+		<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+			<span class="n">c_ss</span><span class="p">,</span><span class="n">c_seq</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get_ss_and_seq</span><span class="p">()</span>
+			<span class="n">ss</span> <span class="o">+=</span> <span class="n">c_ss</span>
+			<span class="n">seq</span> <span class="o">+=</span> <span class="n">c_seq</span>
+
+		<span class="k">return</span>  <span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sx</span><span class="p">)</span> <span class="o">+</span> <span class="n">ss</span> <span class="o">+</span> <span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sy</span><span class="p">),</span> <span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x_seq</span><span class="p">)</span> <span class="o">+</span> <span class="n">seq</span> <span class="o">+</span> <span class="s">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y_seq</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="SecondaryStructureTree"><a class="viewcode-back" href="../../generated/shape_predictor.ss_tree.SecondaryStructureTree.html#shape_predictor.ss_tree.SecondaryStructureTree">[docs]</a><span class="k">class</span> <span class="nc">SecondaryStructureTree</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Converts a dot bracket notation for secondary structure to a tree </span>
+<span class="sd">	format. The sequence corresponding to the secondary structure is also </span>
+<span class="sd">	required to allow for easy evaluations of what are the contents of each</span>
+<span class="sd">	node.</span>
+
+<span class="sd">	:param ss: Secondary structure in dot bracket notation</span>
+<span class="sd">	:type ss: str</span>
+<span class="sd">	:param seq: Sequence associated with secondary structure</span>
+<span class="sd">	:type seq: str</span>
+<span class="sd">	:raises: ValueError</span>
+
+<span class="sd">	Example:</span>
+<span class="sd">	::	</span>
+<span class="sd">		ss_tree = SecondaryStructureTree(&quot;(.((....))..)&quot;, &quot;GUGCUUCGGCUUC&quot;)</span>
+
+<span class="sd">	Here would be the iternal node structure</span>
+
+<span class="sd">	Internal node structure would be:</span>
+<span class="sd">	::</span>
+<span class="sd">		Basepair G-C</span>
+<span class="sd">			Bulge U-UU</span>
+<span class="sd">				Basepair G-C</span>
+<span class="sd">					Basepair C-G</span>
+<span class="sd">						Bulge UUCG-</span>
+
+
+<span class="sd">	Attributes</span>
+<span class="sd">	----------</span>
+<span class="sd">	`basepairs` : List of Basepair Objects </span>
+<span class="sd">		all basepair nodes</span>
+<span class="sd">	`bulges` : List of Bulge Objects</span>
+<span class="sd">		all bulge nodes</span>
+<span class="sd">	`nodes` : List of SS Node Objects </span>
+<span class="sd">		all nodes</span>
+<span class="sd">	`ss` : List</span>
+<span class="sd">		secondary structure</span>
+<span class="sd">	`seq` : List</span>
+<span class="sd">		sequence </span>
+
+<span class="sd">	&quot;&quot;&quot;</span>
+
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ss</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">seq</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Generates a new SecondaryStructureTree</span>
+
+<span class="sd">		:param ss: Secondary structure in dot bracket notation</span>
+<span class="sd">		:type ss: str</span>
+<span class="sd">		:param seq: Sequence associated with secondary structure</span>
+<span class="sd">		:type seq: str</span>
+<span class="sd">		:raises: ValueError</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">basepairs</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">bulges</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ss</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">seq</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">nodes</span> <span class="o">=</span> <span class="p">[]</span>
+
+		<span class="c">#empty tree, currently used for making decoy secondary structure / </span>
+		<span class="c">#sequences</span>
+		<span class="k">if</span> <span class="n">ss</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+			<span class="k">return</span>
+
+		<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">):</span>
+			<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;secondary structure and sequence are not the same length&quot;</span><span class="p">)</span>
+
+		<span class="c">#remove the single stranded start, these parts are NOT included in the</span>
+		<span class="c">#node tree</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_remove_single_strand_start</span><span class="p">()</span>
+
+		<span class="c">#starts recursive process of building nodes</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_build_tree</span><span class="p">()</span>
+
+		<span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">ss_type</span> <span class="o">==</span> <span class="s">&quot;Basepair&quot;</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">basepairs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+			<span class="k">elif</span> <span class="n">node</span><span class="o">.</span><span class="n">ss_type</span> <span class="o">==</span> <span class="s">&quot;Bulge&quot;</span><span class="p">:</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">bulges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+	<span class="k">def</span> <span class="nf">_remove_single_strand_start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Removes the start and end single stranded portions of the dot bracket</span>
+<span class="sd">		notation and are put in SingleStranded nodes </span>
+
+<span class="sd">		Example:</span>
+
+<span class="sd">		self.ss =&gt; [., ., ., ., (, (, (, (, ., ., ., ), ), ), ), ., ., .]</span>
+<span class="sd">		self.seq =&gt; [A, A, A, A, G, G, G, C, U, U, C, G, G, C, C, C, A, A, A]</span>
+
+<span class="sd">		&gt;&gt;&gt;self._remove_single_strand_start()</span>
+
+<span class="sd">		self.ss =&gt; [(, (, (, (, ., ., ., ), ), ), )]</span>
+<span class="sd">		self.seq =&gt; [G, G, G, C, U, U, C, G, G, C, C, C]</span>
+
+<span class="sd">		&quot;&quot;&quot;</span>
+
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;.&quot;</span><span class="p">:</span>
+			<span class="n">end</span> <span class="o">=</span> <span class="n">get_dot_bounds</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="p">)</span>
+			<span class="n">ss</span> <span class="o">=</span> <span class="n">SingleStranded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seq</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">end</span><span class="o">+</span><span class="mi">2</span><span class="p">])</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span>
+			<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">end</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">seq</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+			<span class="c">##print self.ss</span>
+
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;.&quot;</span><span class="p">:</span>
+			<span class="n">end</span> <span class="o">=</span> <span class="n">get_dot_bounds</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="p">,</span><span class="n">reverse</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+			<span class="n">ss</span> <span class="o">=</span> <span class="n">SingleStranded</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seq</span><span class="p">[</span><span class="n">end</span><span class="o">-</span><span class="mi">1</span><span class="p">:])</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span>
+			<span class="n">diff</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="p">)</span><span class="o">-</span><span class="n">end</span>
+			<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">diff</span><span class="p">):</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">seq</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+
+	<span class="k">def</span> <span class="nf">_build_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Starts the recursive process of building the tree from the secondary </span>
+<span class="sd">		structure list. Each time a secondary structure element is detected,</span>
+<span class="sd">		either a basepair or a bulge a node is created and the secondary </span>
+<span class="sd">		structure elements between it are sent to a new node</span>
+
+<span class="sd">		Example:</span>
+
+<span class="sd">		Current State:</span>
+<span class="sd">		self.ss =&gt; [(, (, (, (, ., ., ., ), ), ), )]</span>
+<span class="sd">		self.seq =&gt; [G, G, G, C, U, U, C, G, G, C, C, C]</span>
+
+<span class="sd">		first element in self.ss is &quot;(&quot; so new basepair node is created</span>
+
+<span class="sd">		node = Basepair([(, (, (, (, ., ., ., ), ), ), )],[G, G, G, C, U, U, C, G, G, C, C, C])</span>
+
+<span class="sd">		node.ss =&gt; [(, (, (, ., ., ., ), ), )]</span>
+<span class="sd">		node.seq =&gt; [G, G, C, U, U, C, G, G, C, C]</span>
+<span class="sd">		node.bp_type =&gt; GC</span>
+
+<span class="sd">		Notice that the node.ss and node.seq are two elements shorter. The</span>
+<span class="sd">		first and last elements were removed from both node.ss and node.seq</span>
+<span class="sd">		these become the bp type and the rest of the ss and seq are recursively</span>
+<span class="sd">		shortened as they are passed to this nodes children. </span>
+<span class="sd">		&quot;&quot;&quot;</span>
+
+		<span class="n">node</span> <span class="o">=</span> <span class="bp">None</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;(&quot;</span><span class="p">:</span>
+			<span class="n">pair</span> <span class="o">=</span> <span class="n">get_bracket_pair</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="p">)</span>
+			<span class="n">node</span> <span class="o">=</span> <span class="n">Basepair</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">pair</span><span class="o">+</span><span class="mi">1</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">seq</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">pair</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+
+			<span class="bp">self</span><span class="o">.</span><span class="n">ss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="p">[</span><span class="n">pair</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">seq</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">seq</span><span class="p">[</span><span class="n">pair</span><span class="o">+</span><span class="mi">1</span><span class="p">:]</span>
+
+
+		<span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;.&quot;</span><span class="p">:</span>	
+			<span class="n">node</span> <span class="o">=</span> <span class="n">Bulge</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ss</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">seq</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">ss</span> <span class="o">=</span> <span class="p">[]</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">seq</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+		<span class="c">#breath first transverse to vist all node children </span>
+		<span class="n">open_nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">node</span><span class="p">]</span>
+		<span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">open_nodes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="n">current</span> <span class="o">=</span> <span class="n">open_nodes</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+			<span class="k">if</span> <span class="n">current</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+				<span class="k">continue</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
+			<span class="n">current</span><span class="o">.</span><span class="n">assign_all_children</span><span class="p">()</span>
+
+			<span class="n">open_nodes</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">current</span><span class="o">.</span><span class="n">children</span><span class="p">)</span>
+	</div>
+<span class="k">def</span> <span class="nf">is_au</span><span class="p">(</span><span class="n">bp_str</span><span class="p">):</span>
+	<span class="k">if</span> <span class="n">bp_str</span> <span class="o">==</span> <span class="s">&quot;AU&quot;</span> <span class="ow">or</span> <span class="n">bp_str</span> <span class="o">==</span> <span class="s">&quot;UA&quot;</span><span class="p">:</span>
+		<span class="k">return</span> <span class="mi">1</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="k">return</span> <span class="mi">0</span>
+
+<span class="k">def</span> <span class="nf">is_gc</span><span class="p">(</span><span class="n">bp_str</span><span class="p">):</span>
+	<span class="k">if</span> <span class="n">bp_str</span> <span class="o">==</span> <span class="s">&quot;GC&quot;</span> <span class="ow">or</span> <span class="n">bp_str</span> <span class="o">==</span> <span class="s">&quot;CG&quot;</span><span class="p">:</span>
+		<span class="k">return</span> <span class="mi">1</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="k">return</span> <span class="mi">0</span> 
+
+<span class="k">def</span> <span class="nf">is_wc</span><span class="p">(</span><span class="n">bp_str</span><span class="p">):</span>
+	<span class="k">if</span> <span class="n">is_au</span><span class="p">(</span><span class="n">bp_str</span><span class="p">)</span> <span class="ow">or</span> <span class="n">is_gc</span><span class="p">(</span><span class="n">bp_str</span><span class="p">):</span>
+		<span class="k">return</span> <span class="mi">1</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="k">return</span> <span class="mi">0</span>
+
+<span class="k">def</span> <span class="nf">get_max_stretch</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">seq</span><span class="p">):</span>
+
+	<span class="nb">max</span> <span class="o">=</span> <span class="mi">0</span>
+	<span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+	<span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">seq</span><span class="p">:</span>
+		<span class="k">if</span> <span class="n">e</span> <span class="o">==</span> <span class="n">n</span><span class="p">:</span>
+			<span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="nb">max</span><span class="p">:</span>
+				<span class="nb">max</span> <span class="o">=</span> <span class="n">count</span>
+			<span class="n">count</span> <span class="o">=</span><span class="mi">0</span>
+
+	<span class="k">return</span> <span class="nb">max</span>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Joseph D. Yesselman.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

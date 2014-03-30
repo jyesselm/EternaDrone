@@ -1,0 +1,7 @@
+shape_predictor.ss_tree.Bulge
+=============================
+
+.. currentmodule:: shape_predictor.ss_tree
+
+.. autoclass:: Bulge
+   :members:

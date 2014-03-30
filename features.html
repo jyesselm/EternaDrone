@@ -1,0 +1,264 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Features &mdash; shape_predictor 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="shape_predictor 0.1 documentation" href="index.html"/>
+        <link rel="next" title="shape_predictor.feature_generator.FeatureGenerator" href="generated/shape_predictor.feature_generator.FeatureGenerator.html"/>
+        <link rel="prev" title="shape_predictor.ss_tree.SSN_SingleStranded" href="generated/shape_predictor.ss_tree.SSN_SingleStranded.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> shape_predictor</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="secondary_structure.html">Secondary Structure Layout</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="secondary_structure.html#secondary-structure-classes">Secondary Structure Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="secondary_structure.html#types-of-nodes">Types of Nodes</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-a-feature">What is a Feature?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#feature-generation">Feature Generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#adding-new-features">Adding New Features</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="model_testing.html">Model Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="model_testing.html#machine-learned-model">Machine Learned Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_testing.html#custom-specified-model">Custom Specified Model</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/shape_predictor.util.get_constructs_from_rdats.html">shape_predictor.util.get_constructs_from_rdats</a></li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">shape_predictor</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Features</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/features.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="features">
+<h1>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="what-is-a-feature">
+<h2>What is a Feature?<a class="headerlink" href="#what-is-a-feature" title="Permalink to this headline">¶</a></h2>
+<p>A feature is loosely defined as any value that can be calculated based on sequence/secondary structure of a construct that can be correlated with its final SHAPE score.</p>
+<p>No one parameter is likely to highly correlate directly with the SHAPE score but by using a combination of many it is possible to build an empirical model to help predict the success of a sequence to form into its target secondary structure.</p>
+<p>An few example features: the number of Guanine bases in the sequence, the number of basepairs in the secondary structure, etc.</p>
+</div>
+<div class="section" id="feature-generation">
+<h2>Feature Generation<a class="headerlink" href="#feature-generation" title="Permalink to this headline">¶</a></h2>
+<p>In Shape_Predictor, features are generated by FeatureGenerator Classes and all inherit from the abstract class FeatureGenerator.</p>
+<div class="toctree-wrapper compound">
+<ul class="simple">
+</ul>
+</div>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/shape_predictor.feature_generator.FeatureGenerator.html#shape_predictor.feature_generator.FeatureGenerator" title="shape_predictor.feature_generator.FeatureGenerator"><tt class="xref py py-obj docutils literal"><span class="pre">feature_generator.FeatureGenerator</span></tt></a>()</td>
+<td>Abstract Base class for feature generators, for inheritence only.</td>
+</tr>
+</tbody>
+</table>
+<p>Currently three FeatureGenerators have been implemented, but these are just stratching the surface of possibility, based on the setup of the module its trivial to add your own FeatureGenerator class. See the three below for examples.</p>
+<div class="toctree-wrapper compound">
+<ul class="simple">
+</ul>
+</div>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/shape_predictor.feature_generator.Sequence_FG.html#shape_predictor.feature_generator.Sequence_FG" title="shape_predictor.feature_generator.Sequence_FG"><tt class="xref py py-obj docutils literal"><span class="pre">feature_generator.Sequence_FG</span></tt></a>()</td>
+<td>Sequence dependent features.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="generated/shape_predictor.feature_generator.Structure_FG.html#shape_predictor.feature_generator.Structure_FG" title="shape_predictor.feature_generator.Structure_FG"><tt class="xref py py-obj docutils literal"><span class="pre">feature_generator.Structure_FG</span></tt></a>()</td>
+<td>Structure dependent features.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="generated/shape_predictor.feature_generator.Vienna_FG.html#shape_predictor.feature_generator.Vienna_FG" title="shape_predictor.feature_generator.Vienna_FG"><tt class="xref py py-obj docutils literal"><span class="pre">feature_generator.Vienna_FG</span></tt></a>()</td>
+<td>Vienna RNA feature.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="adding-new-features">
+<h2>Adding New Features<a class="headerlink" href="#adding-new-features" title="Permalink to this headline">¶</a></h2>
+<p>The easy ability to add new features is a critical design philsophy when we wrote Shape_Predictor.</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span class="c">#inherit from abstract class</span>
+<span class="k">class</span> <span class="nc">New_FG</span><span class="p">(</span><span class="n">FeatureGenerator</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                <span class="k">return</span>
+
+        <span class="c">#is called on every construct here is were you populate</span>
+        <span class="c">#your feature</span>
+        <span class="k">def</span> <span class="nf">generate_for_construct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">construct</span><span class="p">):</span>
+                <span class="n">construct</span><span class="o">.</span><span class="n">feature</span><span class="p">[</span><span class="s">&#39;your_new_feature&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1337</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>once your new FeatureGenerator is implemented make sure to register it with FeatureGeneratorFactory and then rebuild all the construct data with rebuild_data.py and thats it</p>
+<div class="toctree-wrapper compound">
+<ul class="simple">
+</ul>
+</div>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="generated/shape_predictor.feature_generator_factory.FeatureGeneratorFactory.html#shape_predictor.feature_generator_factory.FeatureGeneratorFactory" title="shape_predictor.feature_generator_factory.FeatureGeneratorFactory"><tt class="xref py py-obj docutils literal"><span class="pre">feature_generator_factory.FeatureGeneratorFactory</span></tt></a>()</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="generated/shape_predictor.feature_generator.FeatureGenerator.html" class="btn btn-neutral float-right" title="shape_predictor.feature_generator.FeatureGenerator">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="generated/shape_predictor.ss_tree.SSN_SingleStranded.html" class="btn btn-neutral" title="shape_predictor.ss_tree.SSN_SingleStranded"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Joseph D. Yesselman.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

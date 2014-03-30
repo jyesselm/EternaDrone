@@ -1,0 +1,7 @@
+shape_predictor.feature_generator.Vienna_FG
+===========================================
+
+.. currentmodule:: shape_predictor.feature_generator
+
+.. autoclass:: Vienna_FG
+   :members:

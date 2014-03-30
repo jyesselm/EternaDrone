@@ -1,0 +1,257 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Model Testing &mdash; shape_predictor 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="shape_predictor 0.1 documentation" href="index.html"/>
+        <link rel="next" title="shape_predictor.util.get_constructs_from_rdats" href="generated/shape_predictor.util.get_constructs_from_rdats.html"/>
+        <link rel="prev" title="shape_predictor.feature_generator.Vienna_FG" href="generated/shape_predictor.feature_generator.Vienna_FG.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="index.html" class="fa fa-home"> shape_predictor</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="secondary_structure.html">Secondary Structure Layout</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="secondary_structure.html#secondary-structure-classes">Secondary Structure Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="secondary_structure.html#types-of-nodes">Types of Nodes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="features.html#what-is-a-feature">What is a Feature?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="features.html#feature-generation">Feature Generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="features.html#adding-new-features">Adding New Features</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Model Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#machine-learned-model">Machine Learned Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#custom-specified-model">Custom Specified Model</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="generated/shape_predictor.util.get_constructs_from_rdats.html">shape_predictor.util.get_constructs_from_rdats</a></li>
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">shape_predictor</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Model Testing</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/model_testing.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <div class="section" id="model-testing">
+<h1>Model Testing<a class="headerlink" href="#model-testing" title="Permalink to this headline">¶</a></h1>
+<p>model testing is a key part of this project either by machine learning or by custom user rules.</p>
+<p>Both types of models can be tested with the test_model.py</p>
+<div class="section" id="machine-learned-model">
+<h2>Machine Learned Model<a class="headerlink" href="#machine-learned-model" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span class="c">#when called without arguments runs model on all saved constructs</span>
+<span class="c">#using machine learned model</span>
+<span class="n">test_model</span><span class="o">.</span><span class="n">py</span>
+<span class="o">&gt;&gt;&gt;</span><span class="n">Correlation</span> <span class="k">with</span> <span class="n">eterna</span> <span class="n">score</span> <span class="p">(</span><span class="mf">0.85291285713383591</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+
+<span class="c">#can test specific sequence/secondary structure with machine</span>
+<span class="c">#learned model</span>
+<span class="n">test_model</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">seq</span> <span class="s">&quot;AAAAAAAA&quot;</span> <span class="o">-</span><span class="n">ss</span> <span class="s">&quot;((....))&quot;</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">AAAAAAAA</span> <span class="p">((</span><span class="o">....</span><span class="p">))</span> <span class="mf">33.1084278079</span>
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="custom-specified-model">
+<h2>Custom Specified Model<a class="headerlink" href="#custom-specified-model" title="Permalink to this headline">¶</a></h2>
+<p>test_model.py can also be used on any possible model. models can be specified with -model model_filename</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#when called without arguments runs model on all saved constructs</span>
+<span class="n">test_model</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">model</span> <span class="n">model_filename</span>
+<span class="o">&gt;&gt;&gt;</span><span class="n">Correlation</span> <span class="k">with</span> <span class="n">eterna</span> <span class="n">score</span> <span class="p">(</span><span class="mf">0.12447114870578581</span><span class="p">,</span> <span class="mf">2.2421628634213801e-27</span><span class="p">)</span>
+
+<span class="c">#can test specific sequence/secondary structure with machine</span>
+<span class="n">test_model</span><span class="o">.</span><span class="n">py</span> <span class="o">-</span><span class="n">seq</span> <span class="s">&quot;AAAAAAAA&quot;</span> <span class="o">-</span><span class="n">ss</span> <span class="s">&quot;((....))&quot;</span> <span class="o">-</span><span class="n">model</span> <span class="n">model_filename</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">AAAAAAAA</span> <span class="p">((</span><span class="o">....</span><span class="p">))</span> <span class="mf">160.2</span>
+</pre></div>
+</div>
+<p>Model file format is as follows</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span class="n">cat</span> <span class="n">model_filename</span>
+<span class="o">&gt;&gt;&gt;</span><span class="c">#Score Function 1</span>
+<span class="o">&gt;&gt;&gt;</span><span class="mi">100</span> <span class="o">-</span> <span class="p">(</span><span class="n">percent_au</span> <span class="o">-</span> <span class="mf">0.45</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.75</span> <span class="o">+</span> <span class="n">melting_temp</span>
+
+<span class="n">cat</span> <span class="n">model_filename2</span>
+<span class="o">&gt;&gt;&gt;</span><span class="c">#Score Function 1</span>
+<span class="o">&gt;&gt;&gt;</span><span class="mi">100</span> <span class="o">-</span> <span class="p">(</span><span class="n">percent_g</span> <span class="o">-</span> <span class="mf">0.45</span><span class="p">)</span> <span class="o">/</span> <span class="n">free_energy</span>
+<span class="o">&gt;&gt;&gt;</span><span class="c">#Score Function 2</span>
+<span class="o">&gt;&gt;&gt;</span><span class="n">n_pairs</span> <span class="o">+</span> <span class="n">melting_temp</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>You can specify unlimited number of functions using any of the features currently implemented. Here are all the features currently implemented they are also found in the example model file</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span class="c">###Sequence Features###</span>
+<span class="n">percent_a</span> <span class="p">:</span> <span class="n">number</span> <span class="n">of</span> <span class="n">As</span> <span class="o">/</span> <span class="n">total</span> <span class="n">length</span> <span class="n">of</span> <span class="n">sequence</span>
+<span class="n">percent_u</span> <span class="p">:</span> <span class="n">number</span> <span class="n">of</span> <span class="n">Us</span> <span class="o">/</span> <span class="n">total</span> <span class="n">length</span> <span class="n">of</span> <span class="n">sequence</span>
+<span class="n">percent_g</span> <span class="p">:</span> <span class="n">number</span> <span class="n">of</span> <span class="n">Gs</span> <span class="o">/</span> <span class="n">total</span> <span class="n">length</span> <span class="n">of</span> <span class="n">sequence</span>
+<span class="n">percent_c</span> <span class="p">:</span> <span class="n">number</span> <span class="n">of</span> <span class="n">Cs</span> <span class="o">/</span> <span class="n">total</span> <span class="n">length</span> <span class="n">of</span> <span class="n">sequence</span>
+<span class="n">max_a_repeat</span> <span class="p">:</span> <span class="nb">max</span> <span class="n">stretch</span> <span class="n">of</span> <span class="n">As</span><span class="p">,</span> <span class="n">ex</span><span class="o">.</span> <span class="n">AAAUAC</span> <span class="o">=&gt;</span> <span class="mi">3</span>
+<span class="n">max_u_repeat</span> <span class="p">:</span> <span class="nb">max</span> <span class="n">stretch</span> <span class="n">of</span> <span class="n">Us</span>
+<span class="n">max_g_repeat</span> <span class="p">:</span> <span class="nb">max</span> <span class="n">stretch</span> <span class="n">of</span> <span class="n">Gs</span>
+<span class="n">max_c_repeat</span> <span class="p">:</span> <span class="nb">max</span> <span class="n">stretch</span> <span class="n">of</span> <span class="n">Cs</span>
+<span class="c">###Structure Features###</span>
+<span class="n">percent_au</span> <span class="p">:</span> <span class="n">number</span> <span class="n">of</span> <span class="n">AU</span> <span class="n">basepairs</span> <span class="o">/</span> <span class="n">number</span> <span class="n">of</span> <span class="n">basepairs</span> <span class="p">(</span><span class="n">given</span> <span class="n">by</span> <span class="n">target</span> <span class="n">secondary</span> <span class="n">structure</span><span class="p">)</span>
+<span class="n">percent_gc</span> <span class="p">:</span> <span class="n">number</span> <span class="n">of</span> <span class="n">GC</span> <span class="n">basepairs</span> <span class="o">/</span> <span class="n">number</span> <span class="n">of</span> <span class="n">basepairs</span>
+<span class="n">percent_wc</span> <span class="p">:</span> <span class="n">number</span> <span class="n">of</span> <span class="n">Waston</span><span class="o">-</span><span class="n">Crick</span> <span class="p">(</span><span class="n">AU</span> <span class="ow">and</span> <span class="n">GC</span><span class="p">)</span> <span class="n">basepairs</span> <span class="o">/</span> <span class="n">number</span> <span class="n">of</span> <span class="n">basepairs</span>
+<span class="n">percent_nc</span> <span class="p">:</span> <span class="n">number</span> <span class="n">of</span> <span class="n">Nonconical</span> <span class="p">(</span><span class="n">Not</span> <span class="n">AU</span> <span class="ow">and</span> <span class="n">GC</span><span class="p">)</span>  <span class="n">basepairs</span> <span class="o">/</span> <span class="n">number</span> <span class="n">of</span> <span class="n">basepairs</span>
+<span class="n">n_basepairs</span> <span class="p">:</span> <span class="n">number</span> <span class="n">of</span> <span class="n">basepairs</span> <span class="p">(</span><span class="n">given</span> <span class="n">by</span> <span class="n">target</span> <span class="n">secondary</span> <span class="n">structure</span><span class="p">)</span>
+<span class="n">not_capped_loops</span> <span class="p">:</span> <span class="n">inspired</span> <span class="n">by</span> <span class="n">Eli</span> <span class="n">Fisker</span> <span class="p">(</span><span class="n">Eterna</span> <span class="n">Proplayer</span><span class="p">),</span> <span class="n">number</span> <span class="n">of</span> <span class="n">bulges</span><span class="o">/</span><span class="n">hairpins</span><span class="o">/</span><span class="n">junctions</span> <span class="n">that</span> <span class="n">do</span> <span class="n">NOT</span> <span class="n">have</span> <span class="n">a</span> <span class="n">GC</span> <span class="n">pair</span> <span class="n">at</span> <span class="n">their</span> <span class="n">edge</span>
+<span class="n">not_stem_capped</span> <span class="p">:</span> <span class="n">number</span> <span class="n">of</span> <span class="n">stems</span> <span class="p">(</span><span class="n">basepair</span> <span class="n">stretches</span><span class="p">)</span> <span class="n">that</span> <span class="n">do</span> <span class="ow">not</span> <span class="n">start</span> <span class="k">with</span> <span class="n">a</span> <span class="n">GC</span> <span class="n">pair</span> <span class="n">at</span> <span class="n">the</span> <span class="n">edge</span>
+<span class="c">###Vienna Features###</span>
+<span class="n">avg_structure_diff</span> <span class="p">:</span> <span class="n">number</span> <span class="n">of</span> <span class="n">structures</span> <span class="n">that</span> <span class="n">differ</span> <span class="n">between</span> <span class="n">target</span> <span class="n">structure</span> <span class="ow">and</span> <span class="n">vienna</span> <span class="n">predicted</span> <span class="n">structure</span>
+<span class="n">free_energy</span><span class="p">:</span> <span class="n">the</span> <span class="n">vienna</span> <span class="n">calculated</span> <span class="n">free</span> <span class="n">energy</span>
+<span class="c">#melting_temp: the temperature at which vienna predicts 0 free energy</span>
+<span class="n">mfe_prob</span><span class="p">:</span> <span class="n">frequency</span> <span class="n">of</span> <span class="n">mfe</span> <span class="n">structure</span> <span class="ow">in</span> <span class="n">ensemble</span>
+<span class="n">ensemble_diversity</span><span class="p">:</span> <span class="n">vienna</span><span class="s">&#39;s ensemble diversity parameter</span>
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="generated/shape_predictor.util.get_constructs_from_rdats.html" class="btn btn-neutral float-right" title="shape_predictor.util.get_constructs_from_rdats">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="generated/shape_predictor.feature_generator.Vienna_FG.html" class="btn btn-neutral" title="shape_predictor.feature_generator.Vienna_FG"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Joseph D. Yesselman.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
