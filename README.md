@@ -16,11 +16,14 @@ Required python packages: numpy,matplotlib,sklearn, if you have pip or easy_inst
 
 (Special thanks to Eterna player:ElNando888 for outlining a easy way to get the dependencies)
 pip install scipy
+
 pip install ipython
+
 pip install --upgrade distribute  # otherwise, install of matplotlib was complaining
+
 pip install matplotlib
+
 pip install scikit-learn
-# install Rdatkit as described in readme.md
 
 git clone git@github.com:hitrace/rdatkit.git
 
