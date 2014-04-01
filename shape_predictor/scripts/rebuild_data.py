@@ -21,6 +21,7 @@ import re
 import glob
 import argparse
 import random
+from time import time
 
 from shape_predictor.util import *
 from shape_predictor.construct_factory import *
@@ -47,6 +48,7 @@ def generated_simulated_construct_data(nconstructs,feature_generators,features):
 	pickle.dump(rand_constructs,open(data_path+"simulated_decoy_constructs.p","wb"))
 	pickle.dump(sim_data,open(data_path+"simulated_decoy_data.p","wb"))
 
+random.seed(time())
 data_path = os.environ["ShapePredictor"]+"/shape_predictor/data/"
 
 #rebuild construct objects
@@ -70,8 +72,6 @@ generated_simulated_construct_data(101,feature_generators,features)
 #extract just features and eterna score for machine learning fit
 constructs_by_score = {}
 bin = 5
-features = constructs[0].features.keys()
-features.sort(reverse=True)
 for c in constructs:
 	data = []
 	for f in features:
@@ -103,7 +103,7 @@ for k,v in constructs_by_score.iteritems():
 
 pickle.dump(train_data, open( data_path+"train_data.p", "wb" ))
 pickle.dump(test_data, open( data_path+"test_data.p", "wb" ))
-pickle.dump(constructs,open(data_path+"constructs.p","wb"))
+#pickle.dump(constructs,open(data_path+"constructs.p","wb"))
 
 
 

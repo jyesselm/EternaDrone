@@ -59,7 +59,7 @@ for data in X:
 	score = float(data.pop())
 	y.append(score)
 
-y = np.array(y)
+#y = np.array(y)
 
 clf = RandomForestRegressor(n_estimators=10)
 clf.fit(X, y)
