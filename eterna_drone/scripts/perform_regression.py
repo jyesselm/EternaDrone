@@ -45,7 +45,7 @@ def score_orig(train_data,svr):
 		y.append(predicted)
 	return np.array(y)
 
-data_path = os.environ["ShapePredictor"]+"/shape_predictor/data/"
+data_path = os.environ["EternaDrone"]+"/EternaDrone/data/"
 
 train_data = pickle.load( open( data_path+"train_data.p", "rb" ) )
 decoy_data = pickle.load( open( data_path+"simulated_decoy_data.p", "rb" ) )

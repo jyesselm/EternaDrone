@@ -4,11 +4,11 @@ import os
 import matplotlib.pyplot as plt
 from scipy.stats import *
 
-from shape_predictor.util import *
-from shape_predictor.feature_generator_factory import *
+from eterna_drone.util import *
+from eterna_drone.feature_generator_factory import *
  
 MEDIA_DIR = os.path.join(os.path.abspath("."))
-data_path = os.environ["ShapePredictor"]+"/shape_predictor/data/"
+data_path = os.environ["EternaDrone"]+"/EternaDrone/data/"
 feature_generators = FeatureGeneratorFactory.all_generators() 
 
 predictor = pickle.load( open( data_path+"predictor.p", "rb" ) )

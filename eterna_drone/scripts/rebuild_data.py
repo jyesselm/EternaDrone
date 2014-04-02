@@ -23,9 +23,9 @@ import argparse
 import random
 from time import time
 
-from shape_predictor.util import *
-from shape_predictor.construct_factory import *
-from shape_predictor.feature_generator_factory import *
+from eterna_drone.util import *
+from eterna_drone.construct_factory import *
+from eterna_drone.feature_generator_factory import *
 
 
 def generated_simulated_construct_data(nconstructs,feature_generators,features):
@@ -49,10 +49,10 @@ def generated_simulated_construct_data(nconstructs,feature_generators,features):
 	pickle.dump(sim_data,open(data_path+"simulated_decoy_data.p","wb"))
 
 random.seed(time())
-data_path = os.environ["ShapePredictor"]+"/shape_predictor/data/"
+data_path = os.environ["EternaDrone"]+"/EternaDrone/data/"
 
 #rebuild construct objects
-rdat_files_path = os.environ["ShapePredictor"]+"/shape_predictor/rdat_files"
+rdat_files_path = os.environ["EternaDrone"]+"/EternaDrone/rdat_files"
 constructs = get_constructs_from_rdats(dir=rdat_files_path)
 
 #rebuild features

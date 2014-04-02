@@ -8,8 +8,8 @@ import argparse
 import matplotlib.pyplot as plt
 from scipy.stats import *
 
-from EternaDrone.util import *
-from EternaDrone.feature_generator_factory import *
+from eterna_drone.util import *
+from eterna_drone.feature_generator_factory import *
 
 def parse_args():
 	parser = argparse.ArgumentParser(
