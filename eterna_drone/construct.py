@@ -15,12 +15,15 @@
 #	You should have received a copy of the GNU General Public License
 #	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from ss_tree import *
 
 class Construct(object):
 	def __init__(self,seq=None,ss=None,score=None):
 		self.sequence = seq.upper()
 		self.structure = ss
 		self.eterna_score = float(score)
+		self.ss_tree = SecondaryStructureTree(ss,seq)
+
 		self.features = {}
 
 	def __repr__(self):

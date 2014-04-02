@@ -179,7 +179,54 @@ def get_free_energy_at_temp(temp):
 	return float(free_energy)
 
 
+"""
+bulge_type = {}
 
+for c in constructs:
+	if c.eterna_score < 90:
+		continue
+	ss_tree = SecondaryStructureTree(c.structure,c.sequence)
+	for bulge in ss_tree.bulges:
+		if bulge.parent != None:
+			if bulge.parent.ss_type == "Bulge":
+				continue
+		children = bulge.children
+		flag = 0
+		for c in children:
+			if c.ss_type == "Bulge":
+				flag = 1
+				break
+		if flag:
+			continue
+
+		b_type = str(len(bulge.sx)) + "-" + str(len(bulge.sy))
+		if b_type not in bulge_type:
+			bulge_type[b_type] = []
+		bulge_type[b_type].append(bulge)
+
+bulge_type_count= {}
+
+for k,v in bulge_type.iteritems():
+	seq_count = {}	
+	for bulge in v:
+		seq = "".join(bulge.x_seq) + "-" + "".join(bulge.y_seq)
+		if seq not in seq_count:
+			seq_count[seq] = 0
+		seq_count[seq] += 1
+
+	counts = []
+	for k1,v1 in seq_count.iteritems():
+		counts.append([k1,v1])
+	counts.sort(key=lambda x: x[1],reverse=True)
+
+	#if k == "3-3":
+	#	for i in range(5):
+	#		print counts[i]
+
+	bulge_type_count[k] = counts
+
+pickle.dump(bulge_type_count,open(data_path+"bulge_type_count.p","wb"))
+"""
 
 
 

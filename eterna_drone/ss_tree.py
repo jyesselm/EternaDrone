@@ -163,11 +163,57 @@ class SSN_SingleStranded(SecondaryStructureNode):
 	:state parent: None
 
 	"""
-	def __init__(self,seq,parent=None):
+	def __init__(self,ss,seq,parent=None):
 		self.seq = seq
 		self.parent = parent
 		self.children = []
 		self.ss_type = "SingleStranded"
+
+		self.sx = []
+		self.sy = []
+
+		self.x_seq = []
+		self.y_seq = []
+
+		self.seq = seq
+		self.ss = ss
+
+		#print ss,seq
+
+		#remove dots from start
+		end = get_dot_bounds(0,self.ss)
+		if end > -1 and self.ss[0] == ".":
+			for i in range(end+1):
+				self.sx.append(self.ss.pop(0))
+				self.x_seq.append(self.seq.pop(0))
+
+		end = get_dot_bounds(len(self.ss)-1,self.ss,reverse=1)
+		diff = len(self.ss)-end
+		#print "".join(self.ss),diff
+		if diff > 0 and self.ss[-1] == ".":
+			for i in range(diff):
+				self.sy.append(self.ss.pop())
+				self.y_seq.append(self.seq.pop())
+
+		self.org_x_seq = self.x_seq
+		self.org_y_seq = self.y_seq
+
+	def get_ss_and_seq(self):
+		ss = ""
+		seq = ""
+		for c in self.children:
+			c_ss,c_seq = c.get_ss_and_seq()
+			ss += c_ss
+			seq += c_seq
+
+		return  "".join(self.sx) + ss + "".join(self.sy), "".join(self.x_seq) + seq + "".join(self.y_seq[::-1])
+
+	def revert_sequence(self):
+		for i,e in enumerate(self.org_x_seq):
+			self.x_seq[i] = e
+		for i,e in enumerate(self.org_y_seq):
+			self.y_seq[i] = e
+
 
 class SSN_Basepair(SecondaryStructureNode):
 	"""
@@ -300,7 +346,7 @@ class SSN_Bulge(SecondaryStructureNode):
 			ss += c_ss
 			seq += c_seq
 
-		return  "".join(self.sx) + ss + "".join(self.sy), "".join(self.x_seq) + seq + "".join(self.y_seq)
+		return  "".join(self.sx) + ss + "".join(self.sy), "".join(self.x_seq) + seq + "".join(self.y_seq[::-1])
 
 class SecondaryStructureTree(object):
 	"""
@@ -358,8 +404,10 @@ class SecondaryStructureTree(object):
 
 		self.basepairs = []
 		self.bulges = []
+		self.single_strands = []
 		self.ss = list(ss)
 		self.seq = list(seq)
+		self.nodes_to_optimize = []
 		self.nodes = []
 
 		#empty tree, currently used for making decoy secondary structure / 
@@ -372,16 +420,37 @@ class SecondaryStructureTree(object):
 
 		#remove the single stranded start, these parts are NOT included in the
 		#node tree
-		self._remove_single_strand_start()
+		#self._remove_single_strand_start()
 
 		#starts recursive process of building nodes
-		self._build_tree()
+		while len(self.ss) > 0:
+			self._build_tree()
 
 		for node in self.nodes:
 			if node.ss_type == "Basepair":
 				self.basepairs.append(node)
 			elif node.ss_type == "Bulge":
 				self.bulges.append(node)
+			else:
+				self.single_strands.append(node)
+
+		for node in self.basepairs:
+			if node.res1 == "N" or node.res2 == "N":
+				self.nodes_to_optimize.append(node)
+		for node in self.bulges:
+			string = node.x_seq + node.y_seq
+			for e in string:
+				if e == "N":
+					self.nodes_to_optimize.append(node)
+					break
+		for node in self.single_strands:
+			string = node.x_seq + node.y_seq
+			for e in string:
+				if e == "N":
+					self.nodes_to_optimize.append(node)
+					break
+
+		#for node in self.
 
 	def _remove_single_strand_start(self):
 		"""
@@ -446,7 +515,12 @@ class SecondaryStructureTree(object):
 		"""
 
 		node = None
-		if self.ss[0] == "(":
+		if self.ss[0] == "." or self.ss[-1] == "." and len(self.nodes) == 0:
+			node = SSN_SingleStranded(self.ss,self.seq)
+			self.ss = []
+			self.seq = []
+
+		elif self.ss[0] == "(":
 			pair = get_bracket_pair(0,self.ss)
 			node = SSN_Basepair(self.ss[0:pair+1],self.seq[0:pair+1])
 
@@ -471,6 +545,8 @@ class SecondaryStructureTree(object):
 
 			open_nodes.extend(current.children)
 	
+	def get_ss_and_seq(self):
+		return self.nodes[0].get_ss_and_seq()
 
 
 
