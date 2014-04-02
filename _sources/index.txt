@@ -1,12 +1,12 @@
-.. shape_predictor documentation master file, created by
+.. EternaDrone documentation master file, created by
    sphinx-quickstart on Sat Mar 29 12:11:48 2014.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-shape_predictor's documentation
+EternaDrone's documentation
 ===========================================
 
-.. currentmodule:: shape_predictor
+.. currentmodule:: eterna_drone
 
 .. sidebar:: Sidebar Title
 

@@ -1,0 +1,7 @@
+EternaDrone.feature_generator.Sequence_FG
+=========================================
+
+.. currentmodule:: EternaDrone.feature_generator
+
+.. autoclass:: Sequence_FG
+   :members:

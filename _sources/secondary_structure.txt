@@ -6,7 +6,7 @@ Secondary Structure is layed out in a tree structure for easy indexing of base p
 Secondary Structure Classes
 --------
 
-.. currentmodule:: shape_predictor
+.. currentmodule:: eterna_drone
 
 .. toctree::
    :maxdepth: 2

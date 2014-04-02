@@ -1,0 +1,7 @@
+eterna_drone.ss_tree.SSN_Basepair
+=================================
+
+.. currentmodule:: eterna_drone.ss_tree
+
+.. autoclass:: SSN_Basepair
+   :members:

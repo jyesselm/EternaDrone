@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Secondary Structure Layout &mdash; shape_predictor 0.1 documentation</title>
+  <title>Secondary Structure Layout &mdash; EternaDrone 0.1 documentation</title>
   
 
   
@@ -28,9 +28,9 @@
   
 
   
-    <link rel="top" title="shape_predictor 0.1 documentation" href="index.html"/>
-        <link rel="next" title="shape_predictor.ss_tree.SecondaryStructureTree" href="generated/shape_predictor.ss_tree.SecondaryStructureTree.html"/>
-        <link rel="prev" title="shape_predictor’s documentation" href="index.html"/> 
+    <link rel="top" title="EternaDrone 0.1 documentation" href="index.html"/>
+        <link rel="next" title="eterna_drone.ss_tree.SecondaryStructureTree" href="generated/eterna_drone.ss_tree.SecondaryStructureTree.html"/>
+        <link rel="prev" title="Model Testing" href="model_testing.html"/> 
 
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
@@ -44,7 +44,7 @@
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-nav-search">
-        <a href="index.html" class="fa fa-home"> shape_predictor</a>
+        <a href="index.html" class="fa fa-home"> EternaDrone</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -58,19 +58,24 @@
         
         
             <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="features.html">Features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="features.html#what-is-a-feature">What is a Feature?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="features.html#feature-generation">Feature Generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="features.html#adding-new-features">Adding New Features</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="model_testing.html">Model Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="model_testing.html#machine-learned-model">Machine Learned Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_testing.html#custom-specified-model">Custom Specified Model</a></li>
+</ul>
+</li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Secondary Structure Layout</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#secondary-structure-classes">Secondary Structure Classes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#types-of-nodes">Types of Nodes</a></li>
 </ul>
 </li>
 </ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="generated/shape_predictor.util.get_constructs_from_rdats.html">shape_predictor.util.get_constructs_from_rdats</a></li>
-</ul>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="generated/shape_predictor.feature_generator.FeatureGenerator.html">shape_predictor.feature_generator.FeatureGenerator</a></li>
-<li class="toctree-l1"><a class="reference internal" href="generated/shape_predictor.feature_generator.Sequence_FG.html">shape_predictor.feature_generator.Sequence_FG</a></li>
-<li class="toctree-l1"><a class="reference internal" href="generated/shape_predictor.feature_generator.Structure_FG.html">shape_predictor.feature_generator.Structure_FG</a></li>
+<ul class="simple">
 </ul>
 
         
@@ -83,7 +88,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">shape_predictor</a>
+        <a href="index.html">EternaDrone</a>
       </nav>
 
 
@@ -120,11 +125,11 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="generated/shape_predictor.ss_tree.SecondaryStructureTree.html#shape_predictor.ss_tree.SecondaryStructureTree" title="shape_predictor.ss_tree.SecondaryStructureTree"><tt class="xref py py-obj docutils literal"><span class="pre">ss_tree.SecondaryStructureTree</span></tt></a>([ss,&nbsp;seq])</td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/eterna_drone.ss_tree.SecondaryStructureTree.html#eterna_drone.ss_tree.SecondaryStructureTree" title="eterna_drone.ss_tree.SecondaryStructureTree"><tt class="xref py py-obj docutils literal"><span class="pre">ss_tree.SecondaryStructureTree</span></tt></a>([ss,&nbsp;seq])</td>
 <td>Converts a dot bracket notation for secondary structure to a tree  format.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/shape_predictor.ss_tree.SecondaryStructureNode.html#shape_predictor.ss_tree.SecondaryStructureNode" title="shape_predictor.ss_tree.SecondaryStructureNode"><tt class="xref py py-obj docutils literal"><span class="pre">ss_tree.SecondaryStructureNode</span></tt></a></td>
-<td>Holds an element of secondary structure contained in</td>
+<tr class="row-even"><td><a class="reference internal" href="generated/eterna_drone.ss_tree.SecondaryStructureNode.html#eterna_drone.ss_tree.SecondaryStructureNode" title="eterna_drone.ss_tree.SecondaryStructureNode"><tt class="xref py py-obj docutils literal"><span class="pre">ss_tree.SecondaryStructureNode</span></tt></a></td>
+<td>Holds an element of secondary structure contained in SecondaryStructureTree. This is a base class and is never directly instantiated.</td>
 </tr>
 </tbody>
 </table>
@@ -137,14 +142,14 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="generated/shape_predictor.ss_tree.SSN_Basepair.html#shape_predictor.ss_tree.SSN_Basepair" title="shape_predictor.ss_tree.SSN_Basepair"><tt class="xref py py-obj docutils literal"><span class="pre">ss_tree.SSN_Basepair</span></tt></a>(ss,&nbsp;seq[,&nbsp;parent])</td>
-<td></td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/eterna_drone.ss_tree.SSN_Basepair.html#eterna_drone.ss_tree.SSN_Basepair" title="eterna_drone.ss_tree.SSN_Basepair"><tt class="xref py py-obj docutils literal"><span class="pre">ss_tree.SSN_Basepair</span></tt></a>(ss,&nbsp;seq[,&nbsp;parent])</td>
+<td>Holds a basepair</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="generated/shape_predictor.ss_tree.SSN_Bulge.html#shape_predictor.ss_tree.SSN_Bulge" title="shape_predictor.ss_tree.SSN_Bulge"><tt class="xref py py-obj docutils literal"><span class="pre">ss_tree.SSN_Bulge</span></tt></a>(ss,&nbsp;seq[,&nbsp;parent])</td>
-<td></td>
+<tr class="row-even"><td><a class="reference internal" href="generated/eterna_drone.ss_tree.SSN_Bulge.html#eterna_drone.ss_tree.SSN_Bulge" title="eterna_drone.ss_tree.SSN_Bulge"><tt class="xref py py-obj docutils literal"><span class="pre">ss_tree.SSN_Bulge</span></tt></a>(ss,&nbsp;seq[,&nbsp;parent])</td>
+<td>Holds either Bulge,Junction or Hairpin probably could be renamed</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="generated/shape_predictor.ss_tree.SSN_SingleStranded.html#shape_predictor.ss_tree.SSN_SingleStranded" title="shape_predictor.ss_tree.SSN_SingleStranded"><tt class="xref py py-obj docutils literal"><span class="pre">ss_tree.SSN_SingleStranded</span></tt></a>(seq[,&nbsp;parent])</td>
-<td></td>
+<tr class="row-odd"><td><a class="reference internal" href="generated/eterna_drone.ss_tree.SSN_SingleStranded.html#eterna_drone.ss_tree.SSN_SingleStranded" title="eterna_drone.ss_tree.SSN_SingleStranded"><tt class="xref py py-obj docutils literal"><span class="pre">ss_tree.SSN_SingleStranded</span></tt></a>(seq[,&nbsp;parent])</td>
+<td>Represents single stranded RNA before the first basepair and after the</td>
 </tr>
 </tbody>
 </table>
@@ -157,10 +162,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="generated/shape_predictor.ss_tree.SecondaryStructureTree.html" class="btn btn-neutral float-right" title="shape_predictor.ss_tree.SecondaryStructureTree">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="generated/eterna_drone.ss_tree.SecondaryStructureTree.html" class="btn btn-neutral float-right" title="eterna_drone.ss_tree.SecondaryStructureTree">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral" title="shape_predictor’s documentation"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="model_testing.html" class="btn btn-neutral" title="Model Testing"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

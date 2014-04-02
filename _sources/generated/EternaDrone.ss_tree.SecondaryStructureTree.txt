@@ -1,0 +1,7 @@
+EternaDrone.ss_tree.SecondaryStructureTree
+==========================================
+
+.. currentmodule:: EternaDrone.ss_tree
+
+.. autoclass:: SecondaryStructureTree
+   :members:

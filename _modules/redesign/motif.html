@@ -1,0 +1,747 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>redesign.motif &mdash; REDESIGN 0.9 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.9',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="REDESIGN 0.9 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li><a href="../../index.html">REDESIGN 0.9 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for redesign.motif</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: UTF-8 -*-</span>
+
+<span class="c">#This file is part of RNA-Motif-Assembler.</span>
+<span class="c">#	Copyright (C) 2013  Joseph Yesselman &lt;jyesselm@stanford.edu&gt;</span>
+<span class="c">#</span>
+<span class="c">#	This program is free software: you can redistribute it and/or modify</span>
+<span class="c">#	it under the terms of the GNU General Public License as published by</span>
+<span class="c">#	the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c">#	(at your option) any later version.</span>
+<span class="c">#</span>
+<span class="c">#	This program is distributed in the hope that it will be useful,</span>
+<span class="c">#	but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c">#	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c">#	GNU General Public License for more details.</span>
+<span class="c">#</span>
+<span class="c">#	You should have received a copy of the GNU General Public License</span>
+<span class="c">#	along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span> 
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+<span class="kn">from</span> <span class="nn">util</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">rna_element</span> <span class="kn">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="Motif"><a class="viewcode-back" href="../../generated/redesign.motif.Motif.html#redesign.motif.Motif">[docs]</a><span class="k">class</span> <span class="nc">Motif</span><span class="p">(</span><span class="n">RNAElement</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	The basic unit of this project stores the 3D coordinates of a RNA Motif</span>
+<span class="sd">	as well as the 3DNA parameters such as reference frame and origin for </span>
+<span class="sd">	each basepair </span>
+
+<span class="sd">	example initiation:</span>
+
+<span class="sd">	m = Motif(dir=&quot;yourdir&quot;)</span>
+<span class="sd">	where the file structure is </span>
+<span class="sd">	yourdir/</span>
+<span class="sd">		yourdir.pdb</span>
+<span class="sd">		ref_frames.dat</span>
+
+<span class="sd">	m = Motif(pdb=pdb_file_path,ref_frames=ref_frames_file_path)</span>
+
+<span class="sd">	or </span>
+
+<span class="sd">	you can also overwrite the pdb by specifying the pdb argument in </span>
+<span class="sd">	addition to the dir argument</span>
+<span class="sd">	m = Motif(dir=yourdir,pdb=pdb_file_path)</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Motif.__init__"><a class="viewcode-back" href="../../generated/redesign.motif.Motif.html#redesign.motif.Motif.__init__">[docs]</a>	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="nb">dir</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">pdb</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">ref_frames</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">analysis</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Motif object: stores 3D coordinates and 3DNA parameters of RNA Motif</span>
+
+<span class="sd">		Parameters</span>
+<span class="sd">		----------</span>
+<span class="sd">		dir : str, the path of files required for Motif initiation: pdb,</span>
+<span class="sd">			ref_frames.dat which is generated by 3DNA format should be </span>
+<span class="sd">			as follows:</span>
+<span class="sd">				dir/dir.pdb</span>
+<span class="sd">				dir/ref_frames.dat</span>
+<span class="sd">			if this is not your format make sure to use the optional </span>
+<span class="sd">			arguments to supply this info pdb=path,ref_frames=path</span>
+<span class="sd">		pdb : str, optional, the path of the pdb file for the 3D coordinates</span>
+<span class="sd">			of this motif</span>
+<span class="sd">		ref_frames: str, optional, the path of the ref_frame.dat file produced</span>
+<span class="sd">			by 3DNA for the reference and origins of each base pair</span>
+<span class="sd">		analysis : boolean, optional, sometimes large RNAs are loaded in as </span>
+<span class="sd">			Motifs this can be computationally intense. Setting analysis=False</span>
+<span class="sd">			will greatly speed up if no assembly is to be performed on this </span>
+<span class="sd">			motif</span>
+
+<span class="sd">		Attributes</span>
+<span class="sd">		----------</span>
+<span class="sd">		motif_name: str, the name of the pdb used in this motif object</span>
+<span class="sd">		pdb : str, path of the pdb file</span>
+<span class="sd">		ref_frames : str, path of the ref_frames file</span>
+<span class="sd">		name : str, probably should be called dir, but its the directory</span>
+<span class="sd">			that motif files were found (pdb,ref_frames)</span>
+<span class="sd">		structure : ProDy structure object, holds 3D coordinate data</span>
+<span class="sd">		hv: ProDy hiarchical object, holds 3D coordinate data</span>
+<span class="sd">		residues: List of ProDy Residue objects</span>
+<span class="sd">		base_pairs: List of Basepair objects, holds all the basepair info </span>
+<span class="sd">			determined from 3DNA</span>
+<span class="sd">		ends: List of the Basepair objects that are at the end of Motif</span>
+<span class="sd">			this is critical to assemble motifs together its not necessarily</span>
+<span class="sd">			the first and last Basepairs </span>
+<span class="sd">		all_ends: List of BasePair objects that represent all ends, this is </span>
+<span class="sd">			only useful when there are more then two</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">if</span> <span class="nb">dir</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+			<span class="n">split</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;\/&quot;</span><span class="p">,</span><span class="nb">dir</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">split</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">dir</span> <span class="o">=</span> <span class="nb">dir</span>
+			<span class="k">if</span> <span class="n">pdb</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+				<span class="n">pdb</span> <span class="o">=</span> <span class="nb">dir</span><span class="o">+</span><span class="s">&quot;/&quot;</span><span class="o">+</span><span class="n">split</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="s">&quot;.pdb&quot;</span>
+			<span class="k">if</span> <span class="n">ref_frames</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+				<span class="n">ref_frames</span> <span class="o">=</span> <span class="nb">dir</span><span class="o">+</span><span class="s">&quot;/&quot;</span><span class="o">+</span><span class="s">&quot;ref_frames.dat&quot;</span>
+
+		<span class="k">elif</span> <span class="n">pdb</span> <span class="o">!=</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">ref_frames</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">pdb</span> <span class="o">=</span> <span class="n">pdb</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">ref_frames</span> <span class="o">=</span> <span class="n">ref_frames</span>
+
+		<span class="k">else</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+				<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">				Motif was not initiated correctly!</span>
+
+<span class="sd">				examples:</span>
+<span class="sd">				m = Motif(dir=&quot;yourdir&quot;)</span>
+<span class="sd">				where the file structure is </span>
+<span class="sd">				yourdir/</span>
+<span class="sd">					yourdir.pdb</span>
+<span class="sd">					ref_frames.dat</span>
+
+<span class="sd">				m = Motif(pdb=pdb_file_path,ref_frames=ref_frames_file_path)</span>
+
+<span class="sd">				&quot;&quot;&quot;</span><span class="p">)</span>
+
+		<span class="c">#Currently using ProDy to parse pdb files this will be phased out</span>
+		<span class="c">#in the next verision of this project, there are simply to many </span>
+		<span class="c">#limitations in using it</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">structure</span> <span class="o">=</span> <span class="n">parsePDB</span><span class="p">(</span><span class="n">pdb</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">hv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">getHierView</span><span class="p">()</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">chains</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hv</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">real_chains</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">mod_real_chains</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">residues</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">base_pairs</span> <span class="o">=</span> <span class="p">[]</span>
+
+		<span class="n">allowed_res</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;A&#39;</span><span class="p">,</span><span class="s">&#39;U&#39;</span><span class="p">,</span><span class="s">&#39;G&#39;</span><span class="p">,</span><span class="s">&#39;C&#39;</span><span class="p">,</span><span class="s">&#39;rA&#39;</span><span class="p">,</span><span class="s">&#39;rU&#39;</span><span class="p">,</span><span class="s">&#39;rC&#39;</span><span class="p">,</span><span class="s">&#39;rG&#39;</span><span class="p">]</span>
+
+		<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">:</span>
+			<span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="p">):</span>
+				<span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">getResname</span><span class="p">()</span> <span class="ow">in</span> <span class="n">allowed_res</span><span class="p">:</span>
+					<span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">parse_3dna_ref_frames_file</span><span class="p">(</span><span class="n">ref_frames</span><span class="p">)</span>
+
+		<span class="c">#All analysis to determine where the true ends of the Motif start here</span>
+		<span class="k">if</span> <span class="n">analysis</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span>
+			<span class="k">return</span> 
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">determine_chains_by_physical_connection</span><span class="p">()</span>
+
+		<span class="c">#working with only motifs with two chains for now will generalize</span>
+		<span class="c">#later</span>
+		<span class="c">#if len(self.chains) == 2:</span>
+		<span class="c">#	self.ends = self.find_basepair_ends()</span>
+		<span class="c">#else:</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">ends</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_bp_ends_from_chain_ends</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">find_chain_ends</span><span class="p">())</span>
+
+		<span class="c">#determine which residue is going in the 5 prime and 3 prime </span>
+		<span class="c">#directions</span>
+		<span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ends</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">assign_5_or_3_prime</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Motif.force_n_real_chains"><a class="viewcode-back" href="../../generated/redesign.motif.Motif.html#redesign.motif.Motif.force_n_real_chains">[docs]</a>	<span class="k">def</span> <span class="nf">force_n_real_chains</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">n</span><span class="p">):</span>
+
+		<span class="n">chains</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">real_chains</span>
+
+		<span class="n">current_n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">chains</span><span class="p">)</span>
+		<span class="k">while</span> <span class="n">current_n</span> <span class="o">!=</span> <span class="n">n</span><span class="p">:</span>
+			<span class="n">best</span> <span class="o">=</span> <span class="mi">1000</span>
+			<span class="n">pair</span> <span class="o">=</span> <span class="p">[]</span>
+			<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">c1</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chains</span><span class="p">):</span>
+				<span class="k">for</span> <span class="n">j</span><span class="p">,</span><span class="n">c2</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chains</span><span class="p">):</span>
+					<span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">j</span><span class="p">:</span>
+						<span class="k">continue</span>
+					<span class="n">score</span> <span class="o">=</span> <span class="n">best_overlay</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span><span class="n">c2</span><span class="p">)</span>
+					<span class="k">if</span> <span class="n">score</span> <span class="o">&lt;</span> <span class="n">best</span><span class="p">:</span>
+						<span class="n">best</span> <span class="o">=</span> <span class="n">score</span>
+						<span class="n">pair</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span>
+			<span class="n">new_chains</span> <span class="o">=</span> <span class="p">[]</span>
+			<span class="n">to_merge</span> <span class="o">=</span> <span class="p">[]</span>
+			<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chains</span><span class="p">):</span>
+				<span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">==</span> <span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+					<span class="n">to_merge</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="n">new_chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+
+			<span class="n">merged</span> <span class="o">=</span> <span class="n">merge_chains</span><span class="p">(</span><span class="n">to_merge</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">to_merge</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">best</span><span class="o">+</span><span class="mf">0.1</span><span class="p">,</span><span class="n">remove_overlap</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+			<span class="k">if</span> <span class="n">merged</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+				<span class="k">print</span> <span class="s">&quot;made it&quot;</span>
+			<span class="n">new_chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">merged</span><span class="p">)</span>
+			<span class="n">chains</span> <span class="o">=</span> <span class="n">new_chains</span>
+			<span class="n">current_n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">chains</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">real_chains</span> <span class="o">=</span> <span class="n">chains</span>
+</div>
+<div class="viewcode-block" id="Motif.determine_chains_by_physical_connection_old"><a class="viewcode-back" href="../../generated/redesign.motif.Motif.html#redesign.motif.Motif.determine_chains_by_physical_connection_old">[docs]</a>	<span class="k">def</span> <span class="nf">determine_chains_by_physical_connection_old</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ignore_5prime</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Initially was determing chains by residue numbering alone</span>
+<span class="sd">		this unforunately is not sufficient as idenification of connectivity </span>
+<span class="sd">		is critical. Here using a 2A distance constraint between P-O3&#39; and </span>
+<span class="sd">		O5&#39; determines whether two residues are connected. Connected residues</span>
+<span class="sd">		are stored in lists to make chains, chains are always stored 5&#39; to 3&#39;!</span>
+
+<span class="sd">		Parameters</span>
+<span class="sd">		----------</span>
+
+<span class="sd">		Returns</span>
+<span class="sd">		-------</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+
+		<span class="c">#find all chain ends, i.e. only connected to one other residue</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">all_ends</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_chain_ends</span><span class="p">()</span>
+
+		<span class="n">ends</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">all_ends</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">real_chains</span> <span class="o">=</span> <span class="p">[]</span>
+
+		<span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">ends</span><span class="p">:</span>
+			<span class="c">#alway want to go from 5&#39; to 3&#39; thus need to start on 5&#39; end</span>
+			<span class="k">if</span> <span class="n">ignore_5prime</span><span class="o">==</span><span class="bp">False</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_5prime_end</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+				<span class="k">continue</span>
+			<span class="n">current</span> <span class="o">=</span> <span class="n">e</span>
+			<span class="n">seen</span> <span class="o">=</span> <span class="p">{}</span>
+			<span class="n">chain</span> <span class="o">=</span> <span class="p">[]</span>
+			<span class="k">while</span> <span class="n">current</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+				<span class="n">chain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
+				<span class="n">seen</span><span class="p">[</span><span class="n">current</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+				<span class="n">neighbors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_neighbor_residues</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
+				<span class="nb">next</span> <span class="o">=</span> <span class="bp">None</span>
+				<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">neighbors</span><span class="p">:</span>
+					<span class="k">if</span> <span class="ow">not</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+						<span class="nb">next</span> <span class="o">=</span> <span class="n">n</span>
+				<span class="n">current</span> <span class="o">=</span> <span class="nb">next</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">real_chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
+
+		<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">real_chains</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">ignore_5prime</span><span class="o">==</span><span class="bp">False</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">determine_chains_by_physical_connection</span><span class="p">(</span><span class="n">ignore_5prime</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Motif.find_basepair_ends"><a class="viewcode-back" href="../../generated/redesign.motif.Motif.html#redesign.motif.Motif.find_basepair_ends">[docs]</a>	<span class="k">def</span> <span class="nf">find_basepair_ends</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">expected_ends</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Finds which base pairs are at the end of the motif, these ends are</span>
+<span class="sd">		used to join one motif to another through a common basepair thus</span>
+<span class="sd">		this is absolutely critical.</span>
+
+<span class="sd">		Parameters</span>
+<span class="sd">		----------</span>
+<span class="sd">		expected_ends : int, optional, the number of ends a motif should </span>
+<span class="sd">		have,  </span>
+
+<span class="sd">		Returns</span>
+<span class="sd">		-------</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">expected_chain_ends</span> <span class="o">=</span> <span class="n">expected_ends</span><span class="o">*</span><span class="mi">2</span>
+
+		<span class="n">ends</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_chain_ends</span><span class="p">()</span>
+
+		<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ends</span><span class="p">)</span> <span class="o">!=</span> <span class="n">expected_chain_ends</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;could not find the 4 residues that are at </span><span class="se">\</span>
+<span class="s">				the end of this motif &quot;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">dir</span><span class="p">)</span>
+
+		<span class="c">#attempt to match up each residue with every other and see if they</span>
+		<span class="c">#are both contained in a Basepair object</span>
+		<span class="n">motif_ends</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_bp_ends_from_chain_ends</span><span class="p">(</span><span class="n">ends</span><span class="p">)</span>
+
+		<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">motif_ends</span><span class="p">)</span> <span class="o">!=</span> <span class="n">expected_ends</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;could not determined the ends of this </span><span class="se">\</span>
+<span class="s">				motif: &quot;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">dir</span><span class="p">)</span>
+
+		<span class="k">return</span> <span class="n">motif_ends</span>
+</div>
+<div class="viewcode-block" id="Motif.assign_5_or_3_prime"><a class="viewcode-back" href="../../generated/redesign.motif.Motif.html#redesign.motif.Motif.assign_5_or_3_prime">[docs]</a>	<span class="k">def</span> <span class="nf">assign_5_or_3_prime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">e</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		This code might need to be reworked! The purpose is to determine</span>
+<span class="sd">		which residue in a Basepair object is going in the 5&#39; and 3&#39; direction</span>
+<span class="sd">		How this is calculated is position from a chain end. If residue 1 is </span>
+<span class="sd">		positioned in the half the chain its called the 5&#39; end and if its in the</span>
+<span class="sd">		second half its 3&#39;. If its exactly at the 1/2 point then the second residue</span>
+<span class="sd">		is checked in the same manner. If the second residue is also at the 1/2 point</span>
+<span class="sd">		an error is returned</span>
+
+<span class="sd">		Parameters</span>
+<span class="sd">		----------</span>
+<span class="sd">		e : Basepair object, that represents an end basepair</span>
+
+<span class="sd">		Returns</span>
+<span class="sd">		-------</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+
+		<span class="n">res1_pos</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="n">res1_total</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="n">res2_pos</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="n">res2_total</span> <span class="o">=</span> <span class="mi">0</span>
+
+		<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">real_chains</span><span class="p">:</span>
+			<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">c</span><span class="p">):</span>
+				<span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">res1</span> <span class="o">==</span> <span class="n">r</span><span class="p">:</span>
+					<span class="n">res1_pos</span> <span class="o">=</span> <span class="n">i</span>
+					<span class="n">res1_total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+				<span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">res2</span> <span class="o">==</span> <span class="n">r</span><span class="p">:</span>
+					<span class="n">res2_pos</span> <span class="o">=</span> <span class="n">i</span>
+					<span class="n">res2_total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+
+		<span class="k">if</span> <span class="n">res1_pos</span> <span class="o">&lt;</span> <span class="n">res1_total</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span>
+			<span class="n">e</span><span class="o">.</span><span class="n">prime5</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">res1</span>
+			<span class="n">e</span><span class="o">.</span><span class="n">prime3</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">res2</span>
+		<span class="k">elif</span> <span class="n">res1_pos</span> <span class="o">&gt;</span> <span class="n">res1_total</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span>
+			<span class="n">e</span><span class="o">.</span><span class="n">prime3</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">res1</span>
+			<span class="n">e</span><span class="o">.</span><span class="n">prime5</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">res2</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">res2_pos</span> <span class="o">&lt;</span> <span class="n">res2_total</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span>
+				<span class="n">e</span><span class="o">.</span><span class="n">prime3</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">res1</span>
+				<span class="n">e</span><span class="o">.</span><span class="n">prime5</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">res2</span>
+			<span class="k">elif</span> <span class="n">res2_pos</span> <span class="o">&gt;</span> <span class="n">res2_total</span><span class="o">/</span><span class="mi">2</span><span class="p">:</span>
+				<span class="n">e</span><span class="o">.</span><span class="n">prime3</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">res2</span>
+				<span class="n">e</span><span class="o">.</span><span class="n">prime5</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">res1</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="k">print</span> <span class="n">res1_pos</span><span class="p">,</span><span class="n">res1_total</span><span class="p">,</span><span class="n">res2_pos</span><span class="p">,</span><span class="n">res2_total</span>
+				<span class="c">#raise ValueError(&quot;res1 cannot be assigned as either 5prime or 3prime&quot;)</span>
+				<span class="c">#sys.exit()</span>
+
+
+		<span class="c">#is_res1_5prime = self.is_5prime_end(e.res1)</span>
+</div>
+<div class="viewcode-block" id="Motif.get_neighbor_residues"><a class="viewcode-back" href="../../generated/redesign.motif.Motif.html#redesign.motif.Motif.get_neighbor_residues">[docs]</a>	<span class="k">def</span> <span class="nf">get_neighbor_residues</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">res</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		finds the residues that are connected to the current residue by </span>
+<span class="sd">		exhustively searching through all other residues and see if they</span>
+<span class="sd">		can physically connect. This can be probably reworked to initalize </span>
+<span class="sd">		the real_chains</span>
+
+<span class="sd">		Parameters</span>
+<span class="sd">		----------</span>
+<span class="sd">		res : ProDy residue object</span>
+
+<span class="sd">		Returns</span>
+<span class="sd">		-------</span>
+<span class="sd">		connected_res : a list of ProDy residue objects that connected to </span>
+<span class="sd">			the supplied residue</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">connected_res</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">res</span> <span class="o">==</span> <span class="n">r</span><span class="p">:</span>
+				<span class="k">continue</span> 
+			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_connected</span><span class="p">(</span><span class="n">res</span><span class="p">,</span><span class="n">r</span><span class="p">):</span>
+				<span class="n">connected_res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+		<span class="k">return</span> <span class="n">connected_res</span>
+		</div>
+<div class="viewcode-block" id="Motif.find_residue"><a class="viewcode-back" href="../../generated/redesign.motif.Motif.html#redesign.motif.Motif.find_residue">[docs]</a>	<span class="k">def</span> <span class="nf">find_residue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">chain</span><span class="p">,</span><span class="n">num</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Utilizes ProDys hiarchical object to locate a specific residue given</span>
+<span class="sd">		a chain name and residue num </span>
+
+<span class="sd">		Parameters</span>
+<span class="sd">		----------</span>
+<span class="sd">		chain : string, the chain name of desired residue </span>
+
+<span class="sd">		num : int, residue num of desired residue</span>
+
+<span class="sd">		Returns</span>
+<span class="sd">		-------</span>
+<span class="sd">		res : the corresponding ProDy residue object</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="n">res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hv</span><span class="p">[</span><span class="n">chain</span><span class="p">]</span><span class="o">.</span><span class="n">getResidue</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
+
+		<span class="k">if</span> <span class="n">res</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s">&quot;motif does not contain residue in chain &quot;</span><span class="o">+</span>\
+				<span class="n">chain</span><span class="o">+</span><span class="s">&quot;and residue num &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">num</span><span class="p">))</span>
+
+		<span class="k">return</span> <span class="n">res</span>
+</div>
+<div class="viewcode-block" id="Motif.parse_3dna_ref_frames_file"><a class="viewcode-back" href="../../generated/redesign.motif.Motif.html#redesign.motif.Motif.parse_3dna_ref_frames_file">[docs]</a>	<span class="k">def</span> <span class="nf">parse_3dna_ref_frames_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">ref_frame_file</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Parses 3DNA ref_frames.dat file to determine which residues are </span>
+<span class="sd">		basepaired as well as their reference frame and origin </span>
+
+<span class="sd">		Parameters</span>
+<span class="sd">		----------</span>
+<span class="sd">		ref_frame_file : str, path to the 3DNA ref frame file </span>
+
+<span class="sd">		Returns</span>
+<span class="sd">		-------</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">try</span><span class="p">:</span>
+			<span class="nb">input</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">ref_frame_file</span><span class="p">)</span>
+			<span class="n">lines</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+			<span class="n">lines</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+		<span class="k">except</span> <span class="ne">IOError</span><span class="p">:</span>
+			<span class="k">print</span> <span class="s">&quot;3DNA ref frame file=&quot;</span><span class="o">+</span><span class="n">ref_frame_file</span><span class="o">+</span><span class="s">&quot; does not exists &quot;</span><span class="o">+</span>\
+				<span class="s">&quot;please check the path</span><span class="se">\n</span><span class="s">&quot;</span> 
+			<span class="k">raise</span>
+
+		<span class="n">base_pairs</span> <span class="o">=</span> <span class="p">[]</span>
+
+		<span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s">&#39;(\w+)\:\.*(\d+)\_\:\[\.*\w+\]\w+ \- (\w+)\:\.*(\d+)&#39;</span><span class="p">)</span>
+		<span class="n">start_bp</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="n">r</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="n">d</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="n">bps</span> <span class="o">=</span> <span class="bp">None</span>
+		<span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">l</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;...&quot;</span><span class="p">:</span>
+				<span class="n">start_bp</span> <span class="o">=</span> <span class="mi">1</span>
+				<span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">l</span><span class="p">):</span>
+					<span class="n">m</span> <span class="o">=</span> <span class="n">p</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+					<span class="n">bps</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+				<span class="k">continue</span>
+
+			<span class="k">if</span> <span class="n">start_bp</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+				<span class="k">continue</span>
+			<span class="k">if</span> <span class="n">start_bp</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+				<span class="n">split</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;\s+&quot;</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+				<span class="n">d</span> <span class="o">=</span> <span class="p">[</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">split</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="p">]</span>
+				<span class="n">start_bp</span> <span class="o">+=</span> <span class="mi">1</span>
+			<span class="k">elif</span> <span class="n">start_bp</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+				<span class="n">split</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;\s+&quot;</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span>
+				<span class="n">r</span><span class="o">.</span><span class="n">append</span><span class="p">([</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">split</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="p">])</span>
+				<span class="n">start_bp</span> <span class="o">+=</span> <span class="mi">1</span>
+			<span class="c">#have everything, generate BasePair object</span>
+			<span class="k">if</span> <span class="n">start_bp</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+				<span class="n">res1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_residue</span><span class="p">(</span><span class="n">bps</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="nb">float</span><span class="p">(</span><span class="n">bps</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span> 
+				<span class="n">res2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_residue</span><span class="p">(</span><span class="n">bps</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="nb">float</span><span class="p">(</span><span class="n">bps</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+				<span class="n">bp</span> <span class="o">=</span> <span class="n">Basepair</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">d</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">r</span><span class="p">),</span><span class="n">res1</span><span class="p">,</span><span class="n">res2</span><span class="p">)</span>
+				<span class="n">base_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bp</span><span class="p">)</span>
+				<span class="n">r</span> <span class="o">=</span> <span class="p">[]</span>
+				<span class="n">d</span> <span class="o">=</span> <span class="p">[]</span>
+
+		<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">base_pairs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;there are not base pairs declared in this ref </span><span class="se">\</span>
+<span class="s">				file=&quot;</span><span class="o">+</span><span class="n">ref_frame_file</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">base_pairs</span> <span class="o">=</span> <span class="n">base_pairs</span>
+</div>
+	<span class="k">def</span> <span class="nf">bp_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="n">wc</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="n">gu</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="n">nc</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="n">unpaired</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="k">for</span> <span class="n">bp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_pairs</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">is_bp_wc</span><span class="p">(</span><span class="n">bp</span><span class="p">):</span>
+				<span class="n">wc</span> <span class="o">+=</span> <span class="mi">1</span>
+			<span class="k">elif</span> <span class="n">is_bp_gu</span><span class="p">(</span><span class="n">bp</span><span class="p">):</span>
+				<span class="n">gu</span> <span class="o">+=</span> <span class="mi">1</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="n">nc</span> <span class="o">+=</span> <span class="mi">1</span>
+		
+		<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">real_chains</span><span class="p">:</span>
+			<span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+				<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_base_pair_for_res</span><span class="p">(</span><span class="n">r</span><span class="p">)</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+					<span class="n">unpaired</span><span class="o">+=</span><span class="mi">1</span>
+		<span class="k">return</span> <span class="n">wc</span><span class="p">,</span><span class="n">gu</span><span class="p">,</span><span class="n">nc</span><span class="p">,</span><span class="n">unpaired</span>
+
+	<span class="c">#MotifChain setup functions</span>
+	<span class="c">##########################################################################</span>
+
+<div class="viewcode-block" id="Motif.find_base_pair"><a class="viewcode-back" href="../../generated/redesign.motif.Motif.html#redesign.motif.Motif.find_base_pair">[docs]</a>	<span class="k">def</span> <span class="nf">find_base_pair</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">res1</span><span class="p">,</span><span class="n">res2</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		locates a Basepair object by the residue num and chain id of both </span>
+<span class="sd">		residues in the base pair. Order of res1 and res2 is not inforced</span>
+
+<span class="sd">		Parameters</span>
+<span class="sd">		----------</span>
+<span class="sd">		res1: array, contains the residue num and chain id of first residue</span>
+<span class="sd">		res2: array, contains the residue num and chain id of second residue</span>
+
+<span class="sd">		Returns</span>
+<span class="sd">		-------</span>
+<span class="sd">		returns a Basepair object</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">for</span> <span class="n">bp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_pairs</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">bp</span><span class="o">.</span><span class="n">res1</span><span class="o">.</span><span class="n">getResnum</span><span class="p">()</span> <span class="o">==</span> <span class="n">res1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">bp</span><span class="o">.</span><span class="n">res2</span><span class="o">.</span><span class="n">getResnum</span><span class="p">()</span> <span class="o">==</span> <span class="n">res2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> \
+			   <span class="ow">and</span> <span class="n">bp</span><span class="o">.</span><span class="n">res1</span><span class="o">.</span><span class="n">getChid</span><span class="p">()</span> <span class="o">==</span> <span class="n">res1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">bp</span><span class="o">.</span><span class="n">res2</span><span class="o">.</span><span class="n">getChid</span><span class="p">()</span> <span class="o">==</span> <span class="n">res2</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+				<span class="k">return</span> <span class="n">bp</span>
+			<span class="k">if</span> <span class="n">bp</span><span class="o">.</span><span class="n">res1</span><span class="o">.</span><span class="n">getResnum</span><span class="p">()</span> <span class="o">==</span> <span class="n">res2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">bp</span><span class="o">.</span><span class="n">res2</span><span class="o">.</span><span class="n">getResnum</span><span class="p">()</span> <span class="o">==</span> <span class="n">res1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> \
+			   <span class="ow">and</span> <span class="n">bp</span><span class="o">.</span><span class="n">res1</span><span class="o">.</span><span class="n">getChid</span><span class="p">()</span> <span class="o">==</span> <span class="n">res2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">bp</span><span class="o">.</span><span class="n">res2</span><span class="o">.</span><span class="n">getChid</span><span class="p">()</span> <span class="o">==</span> <span class="n">res1</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+				<span class="k">return</span> <span class="n">bp</span>
+
+		<span class="k">return</span> <span class="bp">None</span> 
+</div>
+	<span class="k">def</span> <span class="nf">find_base_pair_for_res</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">res</span><span class="p">):</span>
+		<span class="k">for</span> <span class="n">bp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_pairs</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">bp</span><span class="o">.</span><span class="n">res1</span><span class="o">.</span><span class="n">getResnum</span><span class="p">()</span> <span class="o">==</span> <span class="n">res</span><span class="o">.</span><span class="n">getResnum</span><span class="p">()</span> <span class="ow">and</span> <span class="n">bp</span><span class="o">.</span><span class="n">res1</span><span class="o">.</span><span class="n">getChid</span><span class="p">()</span> <span class="o">==</span> <span class="n">res</span><span class="o">.</span><span class="n">getChid</span><span class="p">()</span> <span class="ow">and</span> <span class="n">bp</span><span class="o">.</span><span class="n">res1</span><span class="o">.</span><span class="n">getResname</span><span class="p">()</span> <span class="o">==</span> <span class="n">res</span><span class="o">.</span><span class="n">getResname</span><span class="p">():</span>
+				<span class="k">return</span> <span class="n">bp</span>
+			<span class="k">if</span> <span class="n">bp</span><span class="o">.</span><span class="n">res2</span><span class="o">.</span><span class="n">getResnum</span><span class="p">()</span> <span class="o">==</span> <span class="n">res</span><span class="o">.</span><span class="n">getResnum</span><span class="p">()</span> <span class="ow">and</span> <span class="n">bp</span><span class="o">.</span><span class="n">res2</span><span class="o">.</span><span class="n">getChid</span><span class="p">()</span> <span class="o">==</span> <span class="n">res</span><span class="o">.</span><span class="n">getChid</span><span class="p">()</span> <span class="ow">and</span> <span class="n">bp</span><span class="o">.</span><span class="n">res2</span><span class="o">.</span><span class="n">getResname</span><span class="p">()</span> <span class="o">==</span> <span class="n">res</span><span class="o">.</span><span class="n">getResname</span><span class="p">():</span>
+				<span class="k">return</span> <span class="n">bp</span>
+		<span class="k">return</span> <span class="bp">None</span>
+
+<div class="viewcode-block" id="Motif.generate_motifchain_constraints"><a class="viewcode-back" href="../../generated/redesign.motif.Motif.html#redesign.motif.Motif.generate_motifchain_constraints">[docs]</a>	<span class="k">def</span> <span class="nf">generate_motifchain_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">sbp_string</span><span class="p">,</span><span class="n">ebp_string</span><span class="p">,</span>
+										<span class="n">remove_inbetween_residues</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Parses the command line arguments and finds both the start and end </span>
+<span class="sd">		basepair objects required as input for a MotifChain object. </span>
+
+<span class="sd">		Parameters</span>
+<span class="sd">		----------</span>
+<span class="sd">		sbp_string: str, description of the start basepair in the format</span>
+<span class="sd">		ChainNameResidueNum-ChainNameResidueNum, ex: A100-B32, which would</span>
+<span class="sd">		be a basepair between residue A100 and B32 where A and B are their </span>
+<span class="sd">		chain names and 100 and 32 are the residue numbers </span>
+<span class="sd">		bp_2_string: str, description of the end basepair see sbp_string for </span>
+<span class="sd">		more info</span>
+<span class="sd">		remove_inbetween_residues, optional, bool removes residues inbetween,</span>
+<span class="sd">		the two basepairs to avoid steric collisions this is for redesign of </span>
+<span class="sd">		chains</span>
+
+<span class="sd">		Returns</span>
+<span class="sd">		-------</span>
+<span class="sd">		start_bp: BasePair object, hold information about the start basepair,</span>
+<span class="sd">		this is where the motif chain will build from</span>
+<span class="sd">		end_bp: BasePair object, this is the where the algorithm is attempting</span>
+<span class="sd">		to build to</span>
+<span class="sd">		centers: Array of 3D points (x,y,z), represents steric centers of </span>
+<span class="sd">		residues that will remain fixed and should not be collided with, these</span>
+<span class="sd">		will be check doing building to void steric clashes.</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+
+		<span class="n">bp_1</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;\-&quot;</span><span class="p">,</span><span class="n">sbp_string</span><span class="p">)</span>
+		<span class="n">bp_2</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;\-&quot;</span><span class="p">,</span><span class="n">ebp_string</span><span class="p">)</span> 
+
+		<span class="n">res1</span> <span class="o">=</span> <span class="p">[</span><span class="n">bp_1</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="mi">1</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="n">bp_1</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:])]</span>
+		<span class="n">res2</span> <span class="o">=</span> <span class="p">[</span><span class="n">bp_1</span><span class="p">[</span><span class="mi">1</span><span class="p">][:</span><span class="mi">1</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="n">bp_1</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:])]</span>
+
+		<span class="n">start_bp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_base_pair</span><span class="p">(</span><span class="n">res1</span><span class="p">,</span><span class="n">res2</span><span class="p">)</span>
+
+		<span class="k">if</span> <span class="n">start_bp</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Cannot find base pair &quot;</span><span class="o">+</span><span class="n">bp_1_string</span><span class="p">)</span>
+
+		<span class="n">res1</span> <span class="o">=</span> <span class="p">[</span><span class="n">bp_2</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="mi">1</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="n">bp_2</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:])]</span>
+		<span class="n">res2</span> <span class="o">=</span> <span class="p">[</span><span class="n">bp_2</span><span class="p">[</span><span class="mi">1</span><span class="p">][:</span><span class="mi">1</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="n">bp_2</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:])]</span>
+
+		<span class="n">end_bp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_base_pair</span><span class="p">(</span><span class="n">res1</span><span class="p">,</span><span class="n">res2</span><span class="p">)</span>
+
+		<span class="k">if</span> <span class="n">end_bp</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+			<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Cannot find base pair &quot;</span><span class="o">+</span><span class="n">bp_2_string</span><span class="p">)</span>
+
+		<span class="k">if</span> <span class="n">remove_inbetween_residues</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+			<span class="n">residues</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remove_residues_between</span><span class="p">(</span><span class="n">start_bp</span><span class="p">,</span><span class="n">end_bp</span><span class="p">)</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">residues</span> <span class="o">=</span> <span class="bp">None</span>
+
+		<span class="n">centers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_residue_steric_bead_centers</span><span class="p">(</span><span class="n">exclude_bps</span><span class="o">=</span><span class="p">[</span><span class="n">end_bp</span><span class="p">],</span>
+													   <span class="n">exclude_r</span><span class="o">=</span><span class="n">residues</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">assign_5_or_3_prime</span><span class="p">(</span><span class="n">start_bp</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">assign_5_or_3_prime</span><span class="p">(</span><span class="n">end_bp</span><span class="p">)</span>
+
+		<span class="n">end_bp</span><span class="o">.</span><span class="n">calc_sugar_centers</span><span class="p">()</span>
+		<span class="n">start_bp</span><span class="o">.</span><span class="n">calc_sugar_centers</span><span class="p">()</span>
+
+		<span class="k">return</span> <span class="n">start_bp</span><span class="p">,</span><span class="n">end_bp</span><span class="p">,</span><span class="n">centers</span>
+</div>
+<div class="viewcode-block" id="Motif.remove_residues_between"><a class="viewcode-back" href="../../generated/redesign.motif.Motif.html#redesign.motif.Motif.remove_residues_between">[docs]</a>	<span class="k">def</span> <span class="nf">remove_residues_between</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">start_bp</span><span class="p">,</span><span class="n">end_bp</span><span class="p">,</span><span class="nb">exit</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Removes residues between the start and end base pairs, this is done </span>
+<span class="sd">		to remove possible steric clashes while building a new motif chain</span>
+
+<span class="sd">		Parameters</span>
+<span class="sd">		----------</span>
+<span class="sd">		start_bp, Basepair object, the start of the new motif chain</span>
+<span class="sd">		end_bp, Basepair object, the end of the new motif chain</span>
+
+<span class="sd">		Returns</span>
+<span class="sd">		-------</span>
+<span class="sd">		returns a list of residues that will be excluded from </span>
+
+<span class="sd">		&quot;&quot;&quot;</span>
+
+		<span class="c">#Figure out which residue is likely on the same chain as the other</span>
+		<span class="c">#by comparing residue number, might be good idea to also check</span>
+		<span class="c">#chain name, residues that are closest in number are grouped into &quot;pairs&quot;</span>
+		<span class="n">pairs</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="n">diff1</span> <span class="o">=</span> <span class="n">start_bp</span><span class="o">.</span><span class="n">res1</span><span class="o">.</span><span class="n">getResnum</span><span class="p">()</span> <span class="o">-</span> <span class="n">end_bp</span><span class="o">.</span><span class="n">res1</span><span class="o">.</span><span class="n">getResnum</span><span class="p">()</span>
+		<span class="n">diff2</span> <span class="o">=</span> <span class="n">start_bp</span><span class="o">.</span><span class="n">res1</span><span class="o">.</span><span class="n">getResnum</span><span class="p">()</span> <span class="o">-</span> <span class="n">end_bp</span><span class="o">.</span><span class="n">res2</span><span class="o">.</span><span class="n">getResnum</span><span class="p">()</span>
+
+		<span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">diff1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">diff2</span><span class="p">):</span>
+			<span class="n">pairs</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">start_bp</span><span class="o">.</span><span class="n">res1</span><span class="p">,</span><span class="n">end_bp</span><span class="o">.</span><span class="n">res2</span><span class="p">])</span>
+			<span class="n">pairs</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">start_bp</span><span class="o">.</span><span class="n">res2</span><span class="p">,</span><span class="n">end_bp</span><span class="o">.</span><span class="n">res1</span><span class="p">])</span>
+		<span class="k">else</span><span class="p">:</span>
+			<span class="n">pairs</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">start_bp</span><span class="o">.</span><span class="n">res2</span><span class="p">,</span><span class="n">end_bp</span><span class="o">.</span><span class="n">res2</span><span class="p">])</span>
+			<span class="n">pairs</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">start_bp</span><span class="o">.</span><span class="n">res1</span><span class="p">,</span><span class="n">end_bp</span><span class="o">.</span><span class="n">res1</span><span class="p">])</span>
+
+		<span class="n">mod_real_chains</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="n">exclude_from_beads</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="n">used_chains</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="n">saved_mod_chains</span> <span class="o">=</span> <span class="p">[]</span>
+
+		<span class="c">#keeps track of what residues have already been seen its very easy to </span>
+		<span class="c">#visit a residue multiple times and end up including it by accident</span>
+		<span class="n">seen_res</span> <span class="o">=</span> <span class="p">{}</span>
+		<span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">:</span>
+			<span class="c">#print p</span>
+			<span class="n">start_pos</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+			<span class="n">end_pos</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+			<span class="n">start_chain</span> <span class="o">=</span> <span class="bp">None</span>
+			<span class="n">end_chain</span> <span class="o">=</span> <span class="bp">None</span>
+
+			<span class="c">#check each residue is on the same chain then finding the position</span>
+			<span class="c">#of both in the array will allow removal of all the residues between</span>
+			<span class="c">#by a simple array splice operation</span>
+			<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">real_chains</span><span class="p">:</span>
+				<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">r</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">c</span><span class="p">):</span>
+					<span class="k">if</span> <span class="n">r</span> <span class="o">==</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+						<span class="n">start_pos</span> <span class="o">=</span> <span class="n">i</span>
+						<span class="n">start_chain</span> <span class="o">=</span> <span class="n">c</span>
+					<span class="k">elif</span> <span class="n">r</span> <span class="o">==</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+						<span class="n">end_pos</span> <span class="o">=</span> <span class="n">i</span>
+						<span class="n">end_chain</span> <span class="o">=</span> <span class="n">c</span>
+
+			<span class="k">if</span> <span class="n">start_chain</span> <span class="o">==</span> <span class="bp">None</span> <span class="ow">and</span> <span class="nb">exit</span><span class="p">:</span>
+				<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Could not find what chain &quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="s">&quot; belongs to&quot;</span><span class="p">)</span>
+			<span class="k">elif</span> <span class="n">start_chain</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+				<span class="k">return</span> <span class="bp">None</span>
+
+			<span class="k">if</span> <span class="n">start_chain</span> <span class="o">!=</span> <span class="n">end_chain</span> <span class="ow">and</span> <span class="nb">exit</span><span class="p">:</span>
+				<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;Cannot remove residues inbetween if on two different chains&quot;</span><span class="p">)</span>
+			<span class="k">elif</span> <span class="n">start_chain</span> <span class="o">!=</span> <span class="n">end_chain</span><span class="p">:</span>
+				<span class="k">return</span> <span class="bp">None</span>
+
+			<span class="c">#array splicing is always in the form [A:B] where A &lt; B, check to </span>
+			<span class="c">#make sure thats true</span>
+			<span class="k">if</span> <span class="n">start_pos</span> <span class="o">&gt;</span> <span class="n">end_pos</span><span class="p">:</span>
+				<span class="n">temp</span> <span class="o">=</span> <span class="n">start_pos</span>
+				<span class="n">start_pos</span> <span class="o">=</span> <span class="n">end_pos</span>
+				<span class="n">end_pos</span> <span class="o">=</span> <span class="n">temp</span>
+
+			<span class="n">removed_portion</span> <span class="o">=</span> <span class="n">start_chain</span><span class="p">[</span><span class="n">start_pos</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">end_pos</span><span class="p">]</span>
+			<span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">removed_portion</span><span class="p">:</span>
+				<span class="c">#print r</span>
+				<span class="n">exclude_from_beads</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+				<span class="n">seen_res</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+			<span class="n">saved_mod_chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start_chain</span><span class="p">[:</span><span class="n">start_pos</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+			<span class="n">saved_mod_chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start_chain</span><span class="p">[</span><span class="n">end_pos</span><span class="p">:])</span>
+
+			<span class="n">used</span> <span class="o">=</span> <span class="mi">0</span>
+			<span class="k">for</span> <span class="n">uc</span> <span class="ow">in</span> <span class="n">used_chains</span><span class="p">:</span>
+				<span class="k">if</span> <span class="n">start_chain</span> <span class="o">==</span> <span class="n">uc</span><span class="p">:</span>
+					<span class="n">used</span> <span class="o">=</span> <span class="mi">1</span>
+					<span class="k">break</span>
+
+			<span class="k">if</span> <span class="ow">not</span> <span class="n">used</span><span class="p">:</span>
+				<span class="n">used_chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start_chain</span><span class="p">)</span>
+
+		<span class="n">saved_chain</span> <span class="o">=</span> <span class="p">[]</span>
+		<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">saved_mod_chains</span><span class="p">:</span>
+			<span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">c</span><span class="p">:</span>
+				<span class="k">if</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">seen_res</span><span class="p">:</span>
+					<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">saved_chain</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+						<span class="n">mod_real_chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">saved_chain</span><span class="p">)</span>
+						<span class="n">saved_chain</span> <span class="o">=</span> <span class="p">[]</span>
+				<span class="k">else</span><span class="p">:</span>
+					<span class="n">seen_res</span><span class="p">[</span><span class="n">r</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+					<span class="n">saved_chain</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+					
+			<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">saved_chain</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+				<span class="n">mod_real_chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">saved_chain</span><span class="p">)</span> 
+				<span class="n">saved_chain</span> <span class="o">=</span> <span class="p">[]</span>
+
+		<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">real_chains</span><span class="p">:</span>
+			<span class="n">used</span> <span class="o">=</span> <span class="mi">0</span>
+			<span class="k">for</span> <span class="n">uc</span> <span class="ow">in</span> <span class="n">used_chains</span><span class="p">:</span>
+				<span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="n">uc</span><span class="p">:</span>
+					<span class="n">used</span> <span class="o">=</span> <span class="mi">1</span>
+					<span class="k">break</span>
+			<span class="k">if</span> <span class="ow">not</span> <span class="n">used</span><span class="p">:</span>
+				<span class="n">mod_real_chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+
+		<span class="bp">self</span><span class="o">.</span><span class="n">mod_real_chains</span> <span class="o">=</span> <span class="n">mod_real_chains</span>
+
+		<span class="k">return</span> <span class="n">exclude_from_beads</span>
+</pre></div></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li><a href="../../index.html">REDESIGN 0.9 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Joseph Yesselman.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b2.
+    </div>
+  </body>
+</html>

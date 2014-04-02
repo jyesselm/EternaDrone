@@ -1,0 +1,7 @@
+eterna_drone.ss_tree.SSN_Bulge
+==============================
+
+.. currentmodule:: eterna_drone.ss_tree
+
+.. autoclass:: SSN_Bulge
+   :members:

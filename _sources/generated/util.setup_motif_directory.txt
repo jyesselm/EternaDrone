@@ -1,0 +1,6 @@
+util.setup_motif_directory
+==========================
+
+.. currentmodule:: util
+
+.. autofunction:: setup_motif_directory

@@ -1,0 +1,7 @@
+eterna_drone.feature_generator.Structure_FG
+===========================================
+
+.. currentmodule:: eterna_drone.feature_generator
+
+.. autoclass:: Structure_FG
+   :members:

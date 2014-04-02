@@ -1,0 +1,433 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>EternaDrone.feature_generator &mdash; EternaDrone 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+    <link rel="top" title="EternaDrone 0.1 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        <a href="../../index.html" class="fa fa-home"> EternaDrone</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+        
+            <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../features.html">Features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../features.html#what-is-a-feature">What is a Feature?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../features.html#feature-generation">Feature Generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../features.html#adding-new-features">Adding New Features</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../model_testing.html">Model Testing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../model_testing.html#machine-learned-model">Machine Learned Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../model_testing.html#custom-specified-model">Custom Specified Model</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../secondary_structure.html">Secondary Structure Layout</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../secondary_structure.html#secondary-structure-classes">Secondary Structure Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../secondary_structure.html#types-of-nodes">Types of Nodes</a></li>
+</ul>
+</li>
+</ul>
+<ul class="simple">
+</ul>
+
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">EternaDrone</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>EternaDrone.feature_generator</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            
+  <h1>Source code for EternaDrone.feature_generator</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: UTF-8 -*-</span>
+
+<span class="c">#	Copyright (C) 2013  Joseph Yesselman &lt;jyesselm@stanford.edu&gt;</span>
+<span class="c">#</span>
+<span class="c">#	This program is free software: you can redistribute it and/or modify</span>
+<span class="c">#	it under the terms of the GNU General Public License as published by</span>
+<span class="c">#	the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c">#	(at your option) any later version.</span>
+<span class="c">#</span>
+<span class="c">#	This program is distributed in the hope that it will be useful,</span>
+<span class="c">#	but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c">#	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c">#	GNU General Public License for more details.</span>
+<span class="c">#</span>
+<span class="c">#	You should have received a copy of the GNU General Public License</span>
+<span class="c">#	along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">import</span> <span class="nn">abc</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">ss_tree</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">util</span> <span class="kn">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="FeatureGenerator"><a class="viewcode-back" href="../../generated/EternaDrone.feature_generator.FeatureGenerator.html#EternaDrone.feature_generator.FeatureGenerator">[docs]</a><span class="k">class</span> <span class="nc">FeatureGenerator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Abstract Base class for feature generators, for inheritence only.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+	<span class="n">__metaclass__</span> <span class="o">=</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span>
+
+	<span class="nd">@abc.abstractmethod</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">return</span>
+
+	<span class="nd">@abc.abstractmethod</span>
+<div class="viewcode-block" id="FeatureGenerator.generate_for_construct"><a class="viewcode-back" href="../../generated/EternaDrone.feature_generator.FeatureGenerator.html#EternaDrone.feature_generator.FeatureGenerator.generate_for_construct">[docs]</a>	<span class="k">def</span> <span class="nf">generate_for_construct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">construct</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		Each feature generator should have this function and will take a </span>
+<span class="sd">		construct object and populate its feature member with the features </span>
+<span class="sd">		that said generator creates.</span>
+
+<span class="sd">		:param construct: the construct object to generate features for </span>
+<span class="sd">		:type construct: Construct Object</span>
+
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">return</span>
+</div></div>
+<div class="viewcode-block" id="Sequence_FG"><a class="viewcode-back" href="../../generated/EternaDrone.feature_generator.Sequence_FG.html#EternaDrone.feature_generator.Sequence_FG">[docs]</a><span class="k">class</span> <span class="nc">Sequence_FG</span><span class="p">(</span><span class="n">FeatureGenerator</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Sequence dependent features.</span>
+
+<span class="sd">	currently populates construct.features with </span>
+<span class="sd">	::</span>
+<span class="sd">		percent_a</span>
+<span class="sd">		percent_u</span>
+<span class="sd">		percent_g</span>
+<span class="sd">		percent_c</span>
+<span class="sd">		max_a_repeat</span>
+<span class="sd">		max_u_repeat</span>
+<span class="sd">		max_g_repeat</span>
+<span class="sd">		max_c_repeat</span>
+
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">pass</span>
+
+	<span class="k">def</span> <span class="nf">_get_max_stretch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">residue</span><span class="p">,</span><span class="n">sequence</span><span class="p">):</span>
+		<span class="nb">max</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">e</span> <span class="o">==</span> <span class="n">residue</span><span class="p">:</span>
+				<span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="nb">max</span><span class="p">:</span>
+					<span class="nb">max</span> <span class="o">=</span> <span class="n">count</span>
+				<span class="n">count</span> <span class="o">=</span><span class="mi">0</span>
+
+		<span class="k">return</span> <span class="nb">max</span>
+
+	<span class="k">def</span> <span class="nf">generate_for_construct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">construct</span><span class="p">):</span>
+		<span class="n">a_content</span> <span class="o">=</span> <span class="mf">0.0</span>
+		<span class="n">u_content</span> <span class="o">=</span> <span class="mf">0.0</span>
+		<span class="n">g_content</span> <span class="o">=</span> <span class="mf">0.0</span>
+		<span class="n">c_content</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+		<span class="n">sequence</span> <span class="o">=</span> <span class="n">construct</span><span class="o">.</span><span class="n">sequence</span>
+
+		<span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">e</span> <span class="o">==</span> <span class="s">&quot;A&quot;</span><span class="p">:</span>
+				<span class="n">a_content</span> <span class="o">+=</span> <span class="mi">1</span>
+			<span class="k">elif</span> <span class="n">e</span> <span class="o">==</span> <span class="s">&quot;U&quot;</span><span class="p">:</span>
+				<span class="n">u_content</span> <span class="o">+=</span> <span class="mi">1</span>
+			<span class="k">elif</span> <span class="n">e</span> <span class="o">==</span> <span class="s">&quot;G&quot;</span><span class="p">:</span>
+				<span class="n">g_content</span> <span class="o">+=</span> <span class="mi">1</span>
+			<span class="k">elif</span> <span class="n">e</span> <span class="o">==</span> <span class="s">&quot;C&quot;</span><span class="p">:</span>
+				<span class="n">c_content</span> <span class="o">+=</span> <span class="mi">1</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&quot;sequences can only have A,U,G,C not&quot;</span><span class="o">+</span><span class="n">e</span><span class="p">)</span>
+
+		<span class="n">a_stretch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_max_stretch</span><span class="p">(</span><span class="s">&quot;A&quot;</span><span class="p">,</span><span class="n">sequence</span><span class="p">)</span>
+		<span class="n">u_stretch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_max_stretch</span><span class="p">(</span><span class="s">&quot;U&quot;</span><span class="p">,</span><span class="n">sequence</span><span class="p">)</span>
+		<span class="n">g_stretch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_max_stretch</span><span class="p">(</span><span class="s">&quot;G&quot;</span><span class="p">,</span><span class="n">sequence</span><span class="p">)</span>
+		<span class="n">c_stretch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_max_stretch</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">,</span><span class="n">sequence</span><span class="p">)</span>
+
+		<span class="c">#update features</span>
+		<span class="n">construct</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s">&#39;percent_a&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">a_content</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+		<span class="n">construct</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s">&#39;percent_u&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">u_content</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+		<span class="n">construct</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s">&#39;percent_g&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">g_content</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+		<span class="n">construct</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s">&#39;percent_c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">c_content</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+		<span class="n">construct</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s">&#39;max_a_repeat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">a_stretch</span>
+		<span class="n">construct</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s">&#39;max_u_repeat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">u_stretch</span>
+		<span class="n">construct</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s">&#39;max_g_repeat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">g_stretch</span>
+		<span class="n">construct</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s">&#39;max_c_repeat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">c_stretch</span>
+</div>
+<div class="viewcode-block" id="Structure_FG"><a class="viewcode-back" href="../../generated/EternaDrone.feature_generator.Structure_FG.html#EternaDrone.feature_generator.Structure_FG">[docs]</a><span class="k">class</span> <span class="nc">Structure_FG</span><span class="p">(</span><span class="n">FeatureGenerator</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Structure dependent features.</span>
+
+<span class="sd">	currently populates construct.features with </span>
+<span class="sd">	::</span>
+<span class="sd">		percent_au</span>
+<span class="sd">		percent_gc</span>
+<span class="sd">		percent_wc</span>
+<span class="sd">		percent_nc</span>
+<span class="sd">		n_basepairs</span>
+<span class="sd">		not_capped_loops</span>
+<span class="sd">		not_stem_capped</span>
+<span class="sd">	&quot;&quot;&quot;</span>	
+	
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">pass</span>
+
+	<span class="k">def</span> <span class="nf">generate_for_construct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">construct</span><span class="p">):</span>
+		<span class="n">au_pairs</span> <span class="o">=</span> <span class="mf">0.0</span>
+		<span class="n">gc_pairs</span> <span class="o">=</span> <span class="mf">0.0</span>
+		<span class="n">wc_pairs</span> <span class="o">=</span> <span class="mf">0.0</span>
+		<span class="n">nc_pairs</span> <span class="o">=</span> <span class="mf">0.0</span>
+		<span class="n">pairs</span> <span class="o">=</span> <span class="mf">0.0</span>
+		<span class="n">not_capped_loops</span> <span class="o">=</span> <span class="mf">0.0</span>
+		<span class="n">not_stem_capped</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+		<span class="n">sstree</span> <span class="o">=</span> <span class="n">SecondaryStructureTree</span><span class="p">(</span><span class="n">construct</span><span class="o">.</span><span class="n">structure</span><span class="p">,</span><span class="n">construct</span><span class="o">.</span><span class="n">sequence</span><span class="p">)</span>
+
+		<span class="k">for</span> <span class="n">bp</span> <span class="ow">in</span> <span class="n">sstree</span><span class="o">.</span><span class="n">basepairs</span><span class="p">:</span>
+			<span class="n">bp_str</span> <span class="o">=</span> <span class="n">bp</span><span class="o">.</span><span class="n">bp_type</span>
+			<span class="k">if</span> <span class="n">is_au</span><span class="p">(</span><span class="n">bp_str</span><span class="p">):</span>	
+				<span class="n">au_pairs</span> <span class="o">+=</span> <span class="mi">1</span>
+				<span class="n">wc_pairs</span> <span class="o">+=</span> <span class="mi">1</span>
+			<span class="k">elif</span> <span class="n">is_gc</span><span class="p">(</span><span class="n">bp_str</span><span class="p">):</span>
+				<span class="n">gc_pairs</span> <span class="o">+=</span> <span class="mi">1</span>
+				<span class="n">wc_pairs</span> <span class="o">+=</span> <span class="mi">1</span>
+			<span class="k">else</span><span class="p">:</span>
+				<span class="n">nc_pairs</span> <span class="o">+=</span> <span class="mi">1</span>
+			<span class="n">pairs</span> <span class="o">+=</span> <span class="mi">1</span>
+			<span class="k">if</span> <span class="n">bp</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+				<span class="k">if</span> <span class="ow">not</span> <span class="n">is_gc</span><span class="p">(</span><span class="n">bp</span><span class="o">.</span><span class="n">bp_type</span><span class="p">):</span>
+					<span class="n">not_stem_capped</span> <span class="o">+=</span> <span class="mi">1</span>
+
+		<span class="k">for</span> <span class="n">bulge</span> <span class="ow">in</span> <span class="n">sstree</span><span class="o">.</span><span class="n">bulges</span><span class="p">:</span>
+			<span class="n">children</span> <span class="o">=</span> <span class="n">bulge</span><span class="o">.</span><span class="n">children</span>
+			<span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">children</span><span class="p">:</span>
+				<span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">ss_type</span> <span class="o">!=</span> <span class="s">&quot;Basepair&quot;</span><span class="p">:</span>
+					<span class="k">continue</span>
+				<span class="k">if</span> <span class="ow">not</span> <span class="n">is_gc</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">bp_type</span><span class="p">):</span>
+					<span class="n">not_capped_loops</span> <span class="o">+=</span> <span class="mi">1</span>	
+
+			<span class="k">if</span> <span class="n">bulge</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+				<span class="k">continue</span>
+
+			<span class="k">if</span> <span class="n">bulge</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">ss_type</span> <span class="o">!=</span> <span class="s">&quot;Basepair&quot;</span><span class="p">:</span>
+				<span class="c">#3way junctions</span>
+				<span class="k">continue</span>
+			<span class="k">if</span> <span class="n">bulge</span><span class="o">.</span><span class="n">parent</span> <span class="o">!=</span> <span class="bp">None</span><span class="p">:</span>
+				<span class="k">if</span> <span class="ow">not</span> <span class="n">is_gc</span><span class="p">(</span><span class="n">bulge</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">bp_type</span><span class="p">):</span>
+					<span class="n">not_capped_loops</span> <span class="o">+=</span> <span class="mi">1</span>
+
+		<span class="c">#update features</span>
+		<span class="c">#possibly seperate gu pairs out from nc?</span>
+		<span class="n">construct</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s">&#39;percent_au&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">au_pairs</span> <span class="o">/</span> <span class="n">pairs</span>
+		<span class="n">construct</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s">&#39;percent_gc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gc_pairs</span> <span class="o">/</span> <span class="n">pairs</span>
+		<span class="n">construct</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s">&#39;percent_wc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">wc_pairs</span> <span class="o">/</span> <span class="n">pairs</span>
+		<span class="n">construct</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s">&#39;percent_nc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nc_pairs</span> <span class="o">/</span> <span class="n">pairs</span>
+		<span class="n">construct</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s">&#39;n_basepairs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pairs</span>
+		<span class="n">construct</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s">&#39;not_capped_loops&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">not_capped_loops</span>
+		<span class="n">construct</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s">&#39;not_stem_capped&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">not_stem_capped</span>
+</div>
+<div class="viewcode-block" id="Vienna_FG"><a class="viewcode-back" href="../../generated/EternaDrone.feature_generator.Vienna_FG.html#EternaDrone.feature_generator.Vienna_FG">[docs]</a><span class="k">class</span> <span class="nc">Vienna_FG</span><span class="p">(</span><span class="n">FeatureGenerator</span><span class="p">):</span>
+	<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">	Vienna RNA feature.</span>
+<span class="sd">	currently populates construct.features with</span>
+<span class="sd">	::</span>
+<span class="sd">		avg_structure_diff</span>
+<span class="sd">		free_energy</span>
+<span class="sd">		melting_temp</span>
+<span class="sd">		mfe_prob</span>
+<span class="sd">		ensemble_diversity</span>
+<span class="sd">	&quot;&quot;&quot;</span>
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="k">pass</span>
+
+	<span class="k">def</span> <span class="nf">generate_for_construct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">construct</span><span class="p">):</span>
+		<span class="n">vienna_f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">&quot;seq.fa&quot;</span><span class="p">,</span><span class="s">&quot;w&quot;</span><span class="p">)</span>
+		<span class="n">vienna_f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s">&quot;&gt;seq1</span><span class="se">\n</span><span class="s">&quot;</span><span class="o">+</span><span class="n">construct</span><span class="o">.</span><span class="n">sequence</span><span class="p">)</span>
+		<span class="n">vienna_f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+		<span class="n">subprocess</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="s">&quot;RNAfold -T 37 -p2 -d2 &lt; seq.fa &gt; seq.out&quot;</span><span class="p">,</span><span class="n">shell</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+		<span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">&quot;seq.out&quot;</span><span class="p">)</span>
+		<span class="n">seq_lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+		<span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+		<span class="n">ss_line</span> <span class="o">=</span> <span class="n">seq_lines</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+		<span class="n">spl</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;\s+&quot;</span><span class="p">,</span><span class="n">ss_line</span><span class="p">)</span>
+		<span class="n">predicted_structure</span> <span class="o">=</span> <span class="n">spl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+		<span class="n">free_energy</span> <span class="o">=</span> <span class="n">get_free_energy_at_temp</span><span class="p">(</span><span class="mi">37</span><span class="p">)</span>
+
+
+		<span class="n">diff</span> <span class="o">=</span> <span class="mf">0.0</span>
+		<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">e</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">predicted_structure</span><span class="p">):</span>
+			<span class="k">if</span> <span class="n">e</span> <span class="o">!=</span> <span class="n">construct</span><span class="o">.</span><span class="n">structure</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
+				<span class="n">diff</span> <span class="o">+=</span> <span class="mi">1</span>
+
+		<span class="n">spl</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;\s+&quot;</span><span class="p">,</span><span class="n">seq_lines</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+		<span class="n">done</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="n">current_temp</span> <span class="o">=</span> <span class="mi">130</span>
+		<span class="n">current</span> <span class="o">=</span> <span class="n">get_free_energy_at_temp</span><span class="p">(</span><span class="n">current_temp</span><span class="p">)</span>
+		<span class="n">last_temp</span> <span class="o">=</span> <span class="n">current_temp</span> <span class="o">+</span> <span class="mi">20</span>
+		<span class="n">last</span> <span class="o">=</span> <span class="n">get_free_energy_at_temp</span><span class="p">(</span><span class="n">last_temp</span><span class="p">)</span>
+
+		<span class="n">melting_temp</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+		<span class="k">while</span> <span class="ow">not</span> <span class="n">done</span><span class="p">:</span>
+			<span class="k">if</span> <span class="n">current</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+				<span class="c">#print &quot;made it&quot;</span>
+				<span class="c">#print current_temp,current</span>
+				<span class="n">closest</span> <span class="o">=</span> <span class="mi">10000</span>
+				<span class="n">closest_temp</span> <span class="o">=</span> <span class="mi">0</span>
+				<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">current_temp</span><span class="p">),</span><span class="nb">int</span><span class="p">(</span><span class="n">last_temp</span><span class="p">),</span><span class="mi">1</span><span class="p">):</span>
+					<span class="n">test</span> <span class="o">=</span> <span class="n">get_free_energy_at_temp</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+					<span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">test</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">closest</span><span class="p">)</span> <span class="ow">and</span> <span class="n">test</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+						<span class="n">closest</span> <span class="o">=</span> <span class="n">test</span>
+						<span class="n">closest_temp</span> <span class="o">=</span> <span class="n">i</span>
+
+				<span class="n">done</span> <span class="o">=</span> <span class="mi">1</span>
+				<span class="n">melting_temp</span> <span class="o">=</span> <span class="n">closest_temp</span>
+				<span class="c">#print closest,closest_temp</span>
+
+			<span class="n">last</span> <span class="o">=</span> <span class="n">current</span>
+			<span class="n">last_temp</span> <span class="o">=</span> <span class="n">current_temp</span>
+
+			<span class="n">current_temp</span> <span class="o">-=</span> <span class="mi">5</span>
+			<span class="n">current</span> <span class="o">=</span> <span class="n">get_free_energy_at_temp</span><span class="p">(</span><span class="n">current_temp</span><span class="p">)</span>
+			<span class="k">if</span> <span class="n">current_temp</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+				<span class="n">melting_temp</span> <span class="o">=</span> <span class="mi">0</span>
+				<span class="k">break</span>
+
+		<span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">diff</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">predicted_structure</span><span class="p">)),</span><span class="nb">float</span><span class="p">(</span><span class="n">free_energy</span><span class="p">),</span><span class="n">melting_temp</span><span class="p">,</span><span class="nb">float</span><span class="p">(</span><span class="n">spl</span><span class="p">[</span><span class="mi">7</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]),</span><span class="nb">float</span><span class="p">(</span><span class="n">spl</span><span class="p">[</span><span class="mi">10</span><span class="p">])]</span>
+		
+		<span class="n">construct</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s">&#39;avg_structure_diff&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">diff</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">predicted_structure</span><span class="p">))</span>
+		<span class="n">construct</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s">&#39;free_energy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">free_energy</span><span class="p">)</span>
+		<span class="n">construct</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s">&#39;melting_temp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">melting_temp</span>
+		<span class="n">construct</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s">&#39;mfe_prob&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">spl</span><span class="p">[</span><span class="mi">7</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+		<span class="n">construct</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s">&#39;ensemble_diversity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">spl</span><span class="p">[</span><span class="mi">10</span><span class="p">])</span>
+</pre></div></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2014, Joseph D. Yesselman.
+    </p>
+  </div>
+
+  <a href="https://github.com/snide/sphinx_rtd_theme">Sphinx theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+EternaDrone.feature_generator.FeatureGenerator
+==============================================
+
+.. currentmodule:: EternaDrone.feature_generator
+
+.. autoclass:: FeatureGenerator
+   :members:

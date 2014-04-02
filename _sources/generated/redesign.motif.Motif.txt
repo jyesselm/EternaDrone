@@ -1,0 +1,7 @@
+redesign.motif.Motif
+====================
+
+.. currentmodule:: redesign.motif
+
+.. autoclass:: Motif
+   :members:
