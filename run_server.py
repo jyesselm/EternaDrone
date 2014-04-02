@@ -10,11 +10,11 @@ MEDIA_DIR = os.path.join(os.path.abspath("."))
 data_path = os.environ["EternaDrone"]+"/eterna_drone/data/"
 feature_generators = FeatureGeneratorFactory.all_generators() 
 
-#predictor = pickle.load( open( data_path+"predictor.p", "rb" ) )
-#all_constructs = pickle.load(open(data_path+"constructs.p","rb"))
+predictor = pickle.load( open( data_path+"predictor.p", "rb" ) )
+all_constructs = pickle.load(open(data_path+"constructs.p","rb"))
 
-#features = all_constructs[0].features.keys()
-#features.sort(key = lambda x : len(x), reverse=True)
+features = all_constructs[0].features.keys()
+features.sort(key = lambda x : len(x), reverse=True)
 
 class rest:
 	@cherrypy.expose
