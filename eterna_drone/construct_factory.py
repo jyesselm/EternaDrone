@@ -173,7 +173,7 @@ class ConstructFactory(object):
 			f.write(seq)
 			f.close()
 
-			subprocess.call("~/Downloads/nupack3.0.1/bin/pairs test",shell=True)
+			subprocess.call("pairs test",shell=True)
 
 			score = calculate_estimated_score(seq,ss)
 

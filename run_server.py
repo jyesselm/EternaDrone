@@ -1,21 +1,20 @@
 import cherrypy
 import os
 
-import matplotlib.pyplot as plt
 from scipy.stats import *
 
 from eterna_drone.util import *
 from eterna_drone.feature_generator_factory import *
  
 MEDIA_DIR = os.path.join(os.path.abspath("."))
-data_path = os.environ["EternaDrone"]+"/EternaDrone/data/"
+data_path = os.environ["EternaDrone"]+"/eterna_drone/data/"
 feature_generators = FeatureGeneratorFactory.all_generators() 
 
-predictor = pickle.load( open( data_path+"predictor.p", "rb" ) )
-all_constructs = pickle.load(open(data_path+"constructs.p","rb"))
+#predictor = pickle.load( open( data_path+"predictor.p", "rb" ) )
+#all_constructs = pickle.load(open(data_path+"constructs.p","rb"))
 
-features = all_constructs[0].features.keys()
-features.sort(key = lambda x : len(x), reverse=True)
+#features = all_constructs[0].features.keys()
+#features.sort(key = lambda x : len(x), reverse=True)
 
 class rest:
 	@cherrypy.expose
@@ -99,8 +98,9 @@ class rest:
 if __name__ == "__main__":
 
 	cherrypy.config.update( {
-		'server.socket_host':"0.0.0.0", 
-		'server.socket_port':8181,
+		'server.socket_host':"171.64.65.150", 
+		#'server.socket_host':"127.0.0.1", 
+		'server.socket_port':8080,
 		'tools.staticdir.root': os.path.abspath(os.path.join(os.path.dirname(__file__), ''))
 		#'tools.statiddir.root': "/Users/skullnite/Downloads"
 	} )

@@ -49,21 +49,23 @@ def generated_simulated_construct_data(nconstructs,feature_generators,features):
 	pickle.dump(sim_data,open(data_path+"simulated_decoy_data.p","wb"))
 
 random.seed(time())
-data_path = os.environ["EternaDrone"]+"/EternaDrone/data/"
+data_path = os.environ["EternaDrone"]+"/eterna_drone/data/"
 
 #rebuild construct objects
-rdat_files_path = os.environ["EternaDrone"]+"/EternaDrone/rdat_files"
+rdat_files_path = os.environ["EternaDrone"]+"/eterna_drone/rdat_files"
 constructs = get_constructs_from_rdats(dir=rdat_files_path)
 
 #rebuild features
 feature_generators = FeatureGeneratorFactory.all_generators() 
 #populate_features_for_constructs(constructs,feature_generators)
 
-constructs = pickle.load(open(data_path+"constructs.p","rb"))
-
 #sorted feature list
 features = constructs[0].features.keys()
 features.sort(reverse=True)
+
+constructs = pickle.load(open(data_path+"constructs.p","rb"))
+#pickle.dump(constructs,open(data_path+"constructs.p","wb"))
+#sys.exit()
 
 #build simulated data for decoys in machine learning fit, need about 100
 #decoys
@@ -103,7 +105,7 @@ for k,v in constructs_by_score.iteritems():
 
 pickle.dump(train_data, open( data_path+"train_data.p", "wb" ))
 pickle.dump(test_data, open( data_path+"test_data.p", "wb" ))
-#pickle.dump(constructs,open(data_path+"constructs.p","wb"))
+pickle.dump(constructs,open(data_path+"constructs.p","wb"))
 
 
 
