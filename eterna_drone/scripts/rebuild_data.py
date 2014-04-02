@@ -59,13 +59,13 @@ constructs = get_constructs_from_rdats(dir=rdat_files_path)
 feature_generators = FeatureGeneratorFactory.all_generators() 
 #populate_features_for_constructs(constructs,feature_generators)
 
+constructs = pickle.load(open(data_path+"constructs.p","rb"))
+
 #sorted feature list
 features = constructs[0].features.keys()
 features.sort(reverse=True)
 
-constructs = pickle.load(open(data_path+"constructs.p","rb"))
-#pickle.dump(constructs,open(data_path+"constructs.p","wb"))
-#sys.exit()
+pickle.dump(constructs,open(data_path+"constructs.p","wb"))
 
 #build simulated data for decoys in machine learning fit, need about 100
 #decoys
@@ -105,7 +105,6 @@ for k,v in constructs_by_score.iteritems():
 
 pickle.dump(train_data, open( data_path+"train_data.p", "wb" ))
 pickle.dump(test_data, open( data_path+"test_data.p", "wb" ))
-pickle.dump(constructs,open(data_path+"constructs.p","wb"))
 
 
 
