@@ -94,7 +94,7 @@ class Sequence_FG(FeatureGenerator):
 			elif e == "C":
 				c_content += 1
 			else:
-				raise ValueError("sequences can only have A,U,G,C not"+e)
+				raise ValueError("sequences can only have A,U,G,C not "+e)
 
 		a_stretch = self._get_max_stretch("A",sequence)
 		u_stretch = self._get_max_stretch("U",sequence)
@@ -138,7 +138,10 @@ class Structure_FG(FeatureGenerator):
 		not_capped_loops = 0.0
 		not_stem_capped = 0.0
 
-		sstree = SecondaryStructureTree(construct.structure,construct.sequence)
+		if construct.ss_tree:
+			sstree = construct.ss_tree
+		else:
+			sstree = SecondaryStructureTree(construct.structure,construct.sequence)
 
 		for bp in sstree.basepairs:
 			bp_str = bp.bp_type

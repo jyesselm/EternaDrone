@@ -18,7 +18,7 @@
 from ss_tree import *
 
 class Construct(object):
-	def __init__(self,seq=None,ss=None,score=None):
+	def __init__(self,seq=None,ss=None,score=0):
 		self.sequence = seq.upper()
 		self.structure = ss
 		self.eterna_score = float(score)

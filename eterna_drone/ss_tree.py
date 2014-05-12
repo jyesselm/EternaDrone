@@ -18,6 +18,7 @@
 
 
 import sys
+import re
 
 def get_bracket_pair(pos,ss):
 	"""
@@ -94,15 +95,22 @@ class SecondaryStructureNode(object):
 		sequence information for all of its children 
 		"""
 
-		if self.ss[0] == "(":
+		if self.ss[-1] == ".":
+			bulge = SSN_Bulge(self.ss,self.seq,parent=self)
+			self.children.append(bulge)
+
+			self.ss = []
+			self.seq = []
+
+		elif self.ss[0] == "(":
 
 			pair = get_bracket_pair(0,self.ss)
 			##print self.ss[0:pair+1]
 			bp = SSN_Basepair(self.ss[0:pair+1],self.seq[0:pair+1],parent=self)
 			self.children.append(bp)
 
-			self.ss = self.ss[pair+2:]
-			self.seq = self.seq[pair+2:]
+			self.ss = self.ss[pair+1:]
+			self.seq = self.seq[pair+1:]
 
 		else:
 
@@ -214,6 +222,11 @@ class SSN_SingleStranded(SecondaryStructureNode):
 		for i,e in enumerate(self.org_y_seq):
 			self.y_seq[i] = e
 
+	def set_seq(self,seq):
+		seqs = re.split("\-",seq)
+		self.x_seq = list(seqs[0])
+		if len(seqs) > 1: 
+			self.y_seq = list(seqs[1])
 
 class SSN_Basepair(SecondaryStructureNode):
 	"""
@@ -269,6 +282,11 @@ class SSN_Basepair(SecondaryStructureNode):
 
 		return "(" + ss + ")", self.res1 + seq + self.res2
 
+	def set_seq(self,seq):
+		self.res1 = seq[0]
+		self.res2 = seq[1]
+		self.bp_type = seq
+
 class SSN_Bulge(SecondaryStructureNode):
 	"""
 	Holds either Bulge,Junction or Hairpin probably could be renamed 
@@ -316,7 +334,9 @@ class SSN_Bulge(SecondaryStructureNode):
 		self.seq = seq
 		self.ss = ss
 
-		#print ss,seq
+		#print "start"
+		#print "".join(ss)
+		#print "".join(seq)
 
 		#remove dots from start
 		end = get_dot_bounds(0,self.ss)
@@ -347,6 +367,13 @@ class SSN_Bulge(SecondaryStructureNode):
 			seq += c_seq
 
 		return  "".join(self.sx) + ss + "".join(self.sy), "".join(self.x_seq) + seq + "".join(self.y_seq[::-1])
+
+	def set_seq(self,seq):
+		seqs = re.split("\-",seq)
+		self.x_seq = list(seqs[0])
+		if len(seqs) > 1: 
+			self.y_seq = list(seqs[1])
+
 
 class SecondaryStructureTree(object):
 	"""
@@ -548,7 +575,24 @@ class SecondaryStructureTree(object):
 	def get_ss_and_seq(self):
 		return self.nodes[0].get_ss_and_seq()
 
+def main():
+	ss  = ".....((..((.(......)))....(((((((....).)))..))).(((....).))..)).....(((((((....)))))))....................."
+	seq = "GGAAAGCAAGGACGAAUAAGCCAUAACCAGAGCGAAAGACUCAAUGGAGCCGAAAGAGCAAGCAAUAACUGAUGCUUCGGCAUCAGAAAAGAAACAACAACAACAAC"
 
+	ss_tree = SecondaryStructureTree(ss,seq)
+
+	nss,nseq = ss_tree.get_ss_and_seq()
+
+	#print seq
+	#print nseq
+
+	#print ss
+	#print nss
+
+
+
+if __name__ == '__main__':
+	main()
 
 
 

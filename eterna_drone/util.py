@@ -105,6 +105,12 @@ def compile_model_from_str(model_str,features):
 			for extra_char in groups:
 				model_str = re.sub("\\"+extra_char+f, extra_char+real_f, model_str)
 
+		if re.match(r"^\s*"+f, model_str):
+			model_str = re.sub(f,real_f, model_str)
+
+
+
+
 	full_code_str = "score = " + model_str
 	code_obj = compile(full_code_str, '<string>', 'single')
 	return code_obj
