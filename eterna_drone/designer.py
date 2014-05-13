@@ -3,6 +3,21 @@ import random
 
 from eterna_drone.util import *
 from eterna_drone.feature_generator_factory import *
+from eterna_drone.construct_factory import *
+
+
+def nupack_pair_score(c):
+
+	f = open("test.in","w")
+	f.write(c.sequence)
+	f.close()
+
+	subprocess.call("pairs test",shell=True)
+
+	score =calculate_estimated_score(c.sequence,c.structure)
+
+	return score 
+
 
 class Designer(object):
 	def __init__(self):
@@ -10,6 +25,20 @@ class Designer(object):
 		self.bulge_type_count = pickle.load(open(data_path+"bulge_type_count_top.p","rb"))
 		self.predictor = pickle.load( open( data_path+"predictor.p", "rb" ) )
 		self.n_runs = 10
+		#self.score_function = self.default_scoring_function
+		self.score_function =nupack_pair_score
+
+
+	def default_scoring_function(self,c):
+		populate_features_for_constructs([c],self.feature_generators)
+
+		data = []
+		for f in self.features:
+			data.append(c.features[f])
+
+		predicted_scores = self.predictor.predict([data])
+
+		return predicted_scores[0]
 
 	def _setup(self,construct):
 		count = 0
@@ -31,7 +60,7 @@ class Designer(object):
 
 			count += 1
 
-			if count > 1000:
+			if count > 10000:
 				print "failed"
 				return 
 
@@ -39,26 +68,20 @@ class Designer(object):
 		self.allowed_bps = ['GC','CG','AU','UA']
 		self.exclude = re.compile(r"(GGGG|AAAA|UUUU|CCCC)")
 
-
 		self._setup(construct)
 
 		ss,seq = construct.ss_tree.get_ss_and_seq()
 		construct.sequence = seq
 
-		feature_generators = FeatureGeneratorFactory.all_generators() 
+		self.feature_generators = FeatureGeneratorFactory.all_generators() 
 		constructs = [construct]
-		populate_features_for_constructs(constructs,feature_generators)
+		populate_features_for_constructs(constructs,self.feature_generators)
 
-		features = constructs[0].features.keys()
-		features.sort(reverse=True)
+		self.features = constructs[0].features.keys()
+		self.features.sort(reverse=True)
 
-		data = []
-		for f in features:
-			data.append(construct.features[f])
 
-		predicted_scores = self.predictor.predict([data])
-
-		best = predicted_scores[0]
+		best = self.score_function(construct,)
 		best_seq = construct.sequence
 
 		if len(construct.ss_tree.nodes_to_optimize) == 0:
@@ -88,18 +111,12 @@ class Designer(object):
 				continue
 
 			construct.sequence = seq
-			populate_features_for_constructs([construct],feature_generators)
 
-			data = []
-			for f in features:
-				data.append(construct.features[f])
+			score = self.score_function(construct)
 
-			predicted_scores = self.predictor.predict([data])
-
-			if predicted_scores[0] > best:
-				best = predicted_scores[0]
+			if score > best:
+				best = score
 				best_seq = seq
-			#	print best_seq,best
 
 			else:
 				rand_node.set_seq(old_seq)

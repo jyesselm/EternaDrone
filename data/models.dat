@@ -1,0 +1,34 @@
+50 - (percent_gc - 0.45) 
+-0.175217772701
+100 - (percent_gc - 0.45) 
+-0.175217772701
+100 - (percent_gc - 0.45) 
+-0.175217772701
+100 -percent_gc + 10 
+-0.175217772701
+100 - percent_au / (percent_gc + 0.0001) 
+0.115195256892
+100 - percent_wc + free_energy
+-0.0952858320115
+percent_gc
+0.175217772701
+free_energy
+-0.09307015184
+n_basepairs + free_energy
+-0.144146428539
+avg_structure_diff
+-0.0303419741818
+melting_temp
+0.124433176384
+melting_temp + percent_gc
+0.127087361502
+percent_gc / (n_basepairs + 0.01)
+0.0933625119792
+percent_au  / (n_basepairs + 0.001)
+0.0125742906198
+percent_au  / (n_basepairs + 0.001)
+0.0125742906198
+ percent_au / (n_basepairs + 0.001)
+0.0125742906198
+not_stem_capped
+-0.0718808980341

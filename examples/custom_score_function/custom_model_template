@@ -1,0 +1,27 @@
+#Here is the list of all features currently implemented 
+###Sequence Features###
+#percent_a : number of As / total length of sequence 
+#percent_u : number of Us / total length of sequence 
+#percent_g : number of Gs / total length of sequence 
+#percent_c : number of Cs / total length of sequence 
+#max_a_repeat : max stretch of As, ex. AAAUAC => 3
+#max_u_repeat : max stretch of Us
+#max_g_repeat : max stretch of Gs
+#max_c_repeat : max stretch of Cs
+###Structure Features###
+#percent_au : number of AU basepairs / number of basepairs (given by target secondary structure)
+#percent_gc : number of GC basepairs / number of basepairs
+#percent_wc : number of Waston-Crick (AU and GC) basepairs / number of basepairs
+#percent_nc : number of Nonconical (Not AU and GC)  basepairs / number of basepairs
+#n_basepairs : number of basepairs (given by target secondary structure)
+#not_capped_loops : inspired by Eli Fisker (Eterna Proplayer), number of bulges/hairpins/junctions that do NOT have a GC pair at their edge
+#not_stem_capped : number of stems (basepair stretches) that do not start with a GC pair at the edge 
+###Vienna Features###
+#avg_structure_diff : number of structures that differ between target structure and vienna predicted structure 
+#free_energy: the vienna calculated free energy
+#melting_temp: the temperature at which vienna predicts 0 free energy 
+#mfe_prob: frequency of mfe structure in ensemble  
+#ensemble_diversity: vienna's ensemble diversity parameter 
+                       
+#Score Function 1
+100 - (percent_au - 0.45) * 0.75 + melting_temp 

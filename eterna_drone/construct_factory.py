@@ -116,7 +116,7 @@ def generate_random_rna(size):
 
 	return nodes[0].get_ss_and_seq()
 
-def calculate_estimated_score(seq,ss):
+def calculate_estimated_score(seq,ss,unpaired=0.10,paired=0.90):
 	pairing_sum = {}
 
 	f = open("test.ppairs")
@@ -151,9 +151,9 @@ def calculate_estimated_score(seq,ss):
 		if ss[pos] == ".":
 			paired = 0
 
-		if paired == 0 and v < 0.10:
+		if paired == 0 and v < unpaired:
 			points += 1
-		if paired == 1 and v > 0.90:
+		if paired == 1 and v > paired:
 			points += 1
 
 	return (points / len(seq)) * 100
